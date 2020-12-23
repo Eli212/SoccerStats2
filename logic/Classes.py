@@ -71,6 +71,12 @@ class Player:
                str(self.width) + " " + str(self.point_x) + " " + str(self.point_y)
 
 
+class PlayerSeparated:
+    def __init__(self, number):
+        self.number = number
+        self.location_in_frames = {}
+
+
 class Game:
     def __init__(self, name):
         self.name = name

@@ -22,15 +22,16 @@ def write_frames_to_file(frames_arr, file_name):
 
 
 def read_from_file_to_frame(file_name):
+    print("Starting to read from file: " + file_name)
     frames_arr = []
     f = open(file_name, "r")
     num_of_frames = int(f.readline())
     for idx_frame in range(num_of_frames):
-        print(idx_frame)
+        # print(idx_frame)
         frame_ball = None
         ball_line = f.readline()
         if ball_line != "None\n":
-            print(ball_line)
+            # print(ball_line)
             ball_line = ball_line.split(" ")
             frame_ball = (int(ball_line[0]), int(ball_line[1]))
         players = []
@@ -46,7 +47,18 @@ def read_from_file_to_frame(file_name):
         frames_arr.append(current_frame)
 
     f.close()
+    print("Finished reading from file: " + file_name)
     return frames_arr
+
+
+def separate_players(frames_arr):
+    players_arr = {}
+    for idx_frame, frame in enumerate(frames_arr):
+        for player in frame.players:
+            if str(player.number) not in players_arr:
+                players_arr[str(player.number)] = CLASSES.PlayerSeparated(player.number)
+            players_arr[str(player.number)].location_in_frames[str(idx_frame)] = (player.point_x, player.point_y)
+    print(players_arr["4"].location_in_frames)
 
 
 if __name__ == '__main__':
@@ -55,8 +67,10 @@ if __name__ == '__main__':
     txt_file_name = "demofile2.txt"
     field_img = cv2.imread('sources/TestImages/maracana_homemade.png')
 
-    frames = []
-    frames = track.start_tracking()
-    write_frames_to_file(frames, txt_file_name)
+    # frames = track.start_tracking()
+    # write_frames_to_file(frames, txt_file_name)
+
     frames = read_from_file_to_frame(txt_file_name)
-    tracking.start_vid(vid_path, field_img, frames, max_frames)
+    # tracking.start_vid(vid_path, field_img, frames, max_frames)
+
+    separate_players(frames)
