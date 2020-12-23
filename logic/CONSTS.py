@@ -83,3 +83,5 @@ MARACANA_FIELD_POINTS = {
     "W2": (1414, 149),
     "VW2": (1331, 161)
 }
+
+MAX_FRAMES = 178

@@ -1,7 +1,6 @@
-import math
-
 import track
-import logic.Classes as CLASSES
+import logic.Classes as Classes
+import logic.CONSTS as CONSTS
 from old import tracking
 
 import cv2
@@ -41,10 +40,10 @@ def read_from_file_to_frame(file_name):
         for idx_players in range(num_of_players):
             player_info = f.readline()
             player_info = player_info.split(" ")
-            players.append(CLASSES.Player(int(player_info[0]), float(player_info[1]), float(player_info[2]),
+            players.append(Classes.Player(int(player_info[0]), float(player_info[1]), float(player_info[2]),
                                           float(player_info[3]), float(player_info[4]), float(player_info[5]),
                                           float(player_info[6])))
-        current_frame = CLASSES.Frame(idx_frame, players)
+        current_frame = Classes.Frame(idx_frame, players)
         current_frame.ball = frame_ball
         frames_arr.append(current_frame)
 
@@ -57,17 +56,19 @@ def separate_players(frames_arr):
     players_arr = {}
     for idx_frame, frame in enumerate(frames_arr):
         for player in frame.players:
-            if str(player.number) not in players_arr:
-                players_arr[str(player.number)] = CLASSES.PlayerSeparated(player.number)
-            players_arr[str(player.number)].location_in_frames[str(idx_frame)] = (player.point_x, player.point_y)
-        distance()
-    print(players_arr["3"].location_in_frames)
+            if player.number not in players_arr:
+                players_arr[player.number] = Classes.PlayerSeparated(player.number)
+            players_arr[player.number].location_in_frames[idx_frame] = (player.point_x, player.point_y)
+    # print(players_arr)
+    for player_number in players_arr:
+        for idx_frame in range(CONSTS.MAX_FRAMES):
+            if idx_frame not in players_arr[player_number].location_in_frames:
+                players_arr[player_number].location_in_frames[idx_frame] = None
 
-def distance(point1, point2):
-    dis = math.sqrt(((point1[0]-point2[0])**2)+((point1[1]-point2[1])**2))
-    print("point 1", point1)
-    print("point ", point2)
-    print("dis = ", dis)
+    # for player_number in players_arr:
+    #     print(players_arr[player_number].location_in_frames)
+    print(players_arr[4].location_in_frames)
+
 
 if __name__ == '__main__':
     max_frames = 178
