@@ -65,3 +65,12 @@ class Player:
         self.width = width
         self.point_x = point_x
         self.point_y = point_y
+
+    def __str__(self):
+        return str(self.number) + " " + str(self.tl_x) + " " + str(self.tl_y) + " " + str(self.height) + " " + \
+               str(self.width) + " " + str(self.point_x) + " " + str(self.point_y)
+
+
+class Game:
+    def __init__(self, name):
+        self.name = name

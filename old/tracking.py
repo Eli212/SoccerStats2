@@ -218,12 +218,11 @@ def testing_changing_perspective(the_frame, field_img):
     return field_img_copy
 
 
-def start_vid(vid_name, field_img, frames_arr):
+def start_vid(vid_name, field_img, frames_arr, max_frames=178):
     new_vid_name = "new_vid.avi"
     cap = cv2.VideoCapture(vid_name)
     count = 0
     frame_jump = 1
-    max_frames = 178
     video = cv2.VideoWriter(new_vid_name, 0, 30, (field_img.shape[1], field_img.shape[0]))
     while cap.isOpened() and count < max_frames:
         ret, current_frame = cap.read()

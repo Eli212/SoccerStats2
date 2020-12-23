@@ -180,8 +180,6 @@ def detect(opt, save_img=False):
 
                 # Pass detections to deepsort
                 outputs = deepsort.update(xywhs, confss, im0)
-                # print(outputs)
-
                 if len(outputs) > 0:
                     bbox_xyxy = outputs[:, :4]
                     identities = outputs[:, -1]
@@ -245,11 +243,12 @@ def detect(opt, save_img=False):
         frame_num += 1
         frames_arr.append(current_frame)
 
-        # if frame_num == 50:
+        # if frame_num == 5:
         #     break
     vid_path = 'sources/TestVideos/vid2.mp4'
     field_imgg = cv2.imread('sources/TestImages/maracana_homemade.png')
-    tracking.start_vid(vid_path, field_imgg, frames_arr)
+    return frames_arr
+    # tracking.start_vid(vid_path, field_imgg, frames_arr)
 
     if save_txt or save_img:
         print('Results saved to %s' % os.getcwd() + os.sep + out)
@@ -259,7 +258,7 @@ def detect(opt, save_img=False):
     print('Done. (%.3fs)' % (time.time() - t0))
 
 
-if __name__ == '__main__':
+def start_tracking():
     parser = argparse.ArgumentParser()
     parser.add_argument('--weights', type=str,
                         default='yolov5/weights/yolov5s.pt', help='model.pt path')
@@ -296,4 +295,4 @@ if __name__ == '__main__':
     print(args)
 
     with torch.no_grad():
-        detect(args)
+        return detect(args)
