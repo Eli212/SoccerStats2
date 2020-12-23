@@ -1,3 +1,5 @@
+import math
+
 import track
 import logic.Classes as CLASSES
 from old import tracking
@@ -58,8 +60,14 @@ def separate_players(frames_arr):
             if str(player.number) not in players_arr:
                 players_arr[str(player.number)] = CLASSES.PlayerSeparated(player.number)
             players_arr[str(player.number)].location_in_frames[str(idx_frame)] = (player.point_x, player.point_y)
-    print(players_arr["4"].location_in_frames)
+        distance()
+    print(players_arr["3"].location_in_frames)
 
+def distance(point1, point2):
+    dis = math.sqrt(((point1[0]-point2[0])**2)+((point1[1]-point2[1])**2))
+    print("point 1", point1)
+    print("point ", point2)
+    print("dis = ", dis)
 
 if __name__ == '__main__':
     max_frames = 178
