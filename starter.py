@@ -1,3 +1,5 @@
+import math
+
 import track
 import logic.Classes as Classes
 import logic.CONSTS as CONSTS
@@ -64,11 +66,26 @@ def separate_players(frames_arr):
         for idx_frame in range(CONSTS.MAX_FRAMES):
             if idx_frame not in players_arr[player_number].location_in_frames:
                 players_arr[player_number].location_in_frames[idx_frame] = None
+        # for player_number in players_arr:
+        #     print(players_arr[player_number].location_in_frames)
+    print(players_arr[1].location_in_frames)
 
-    # for player_number in players_arr:
-    #     print(players_arr[player_number].location_in_frames)
-    print(players_arr[4].location_in_frames)
+    #ori-
+    for player_number in players_arr:
+        player_distance=0
+        for idx_frame in range(CONSTS.MAX_FRAMES-1):
+            if players_arr[player_number].location_in_frames[idx_frame] is not None:
+                player_distance += distance(players_arr[1].location_in_frames[idx_frame], players_arr[1].location_in_frames[idx_frame + 1])
+        player_distance = player_distance/100
+        print("player - ", players_arr[player_number].number,"  player_distance  - ", player_distance)
 
+#ori-
+def distance(point1, point2):
+    dis = math.sqrt(((point1[0]-point2[0])**2)+((point1[1]-point2[1])**2))
+    #print("point 1", point1)
+    #print("point ", point2)
+    #print("dis = ", dis)
+    return dis
 
 if __name__ == '__main__':
     max_frames = 178
