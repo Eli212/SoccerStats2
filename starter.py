@@ -1,9 +1,11 @@
+# import track
+# from old import tracking
 import math
 
 import track
 import logic.Classes as Classes
 import logic.CONSTS as CONSTS
-from old import tracking
+import old.tracking as tracking
 
 import cv2
 
@@ -54,38 +56,46 @@ def read_from_file_to_frame(file_name):
     return frames_arr
 
 
-def separate_players(frames_arr):
+def separate_players_and_ball(frames_arr):
     players_arr = {}
+    ball = Classes.BallSeparated()
     for idx_frame, frame in enumerate(frames_arr):
         for player in frame.players:
             if player.number not in players_arr:
                 players_arr[player.number] = Classes.PlayerSeparated(player.number)
             players_arr[player.number].location_in_frames[idx_frame] = (player.point_x, player.point_y)
-    # print(players_arr)
+        ball.location_in_frames[idx_frame] = frame.ball
+
     for player_number in players_arr:
         for idx_frame in range(CONSTS.MAX_FRAMES):
             if idx_frame not in players_arr[player_number].location_in_frames:
                 players_arr[player_number].location_in_frames[idx_frame] = None
-        # for player_number in players_arr:
-        #     print(players_arr[player_number].location_in_frames)
-    print(players_arr[1].location_in_frames)
 
-    #ori-
+    # Sort if you want
+    # for player_number in players_arr:
+    #     players_arr[player_number].sort_location_in_frames()
+
+    return Classes.Game("Maracana", players_arr, ball)
+
+
+def stats_players_distance_covered(players_arr):
     for player_number in players_arr:
-        player_distance=0
-        for idx_frame in range(CONSTS.MAX_FRAMES-1):
+        for idx_frame in range(CONSTS.MAX_FRAMES - 1):
             if players_arr[player_number].location_in_frames[idx_frame] is not None:
-                player_distance += distance(players_arr[1].location_in_frames[idx_frame], players_arr[1].location_in_frames[idx_frame + 1])
-        player_distance = player_distance/100
-        print("player - ", players_arr[player_number].number,"  player_distance  - ", player_distance)
+                players_arr[player_number].distance_covered += \
+                    euclidean_distance(players_arr[1].location_in_frames[idx_frame],
+                                       players_arr[1].location_in_frames[idx_frame + 1])
+        # player_distance = player_distance / 100
 
-#ori-
-def distance(point1, point2):
-    dis = math.sqrt(((point1[0]-point2[0])**2)+((point1[1]-point2[1])**2))
-    #print("point 1", point1)
-    #print("point ", point2)
-    #print("dis = ", dis)
+    for player_number in players_arr:
+        print("player - ", players_arr[player_number].number, "  player_distance  - ",
+              players_arr[player_number].distance_covered)
+
+
+def euclidean_distance(point1, point2):
+    dis = math.sqrt(((point1[0] - point2[0]) ** 2) + ((point1[1] - point2[1]) ** 2))
     return dis
+
 
 if __name__ == '__main__':
     max_frames = 178
@@ -97,6 +107,10 @@ if __name__ == '__main__':
     # write_frames_to_file(frames, txt_file_name)
 
     frames = read_from_file_to_frame(txt_file_name)
-    # tracking.start_vid(vid_path, field_img, frames, max_frames)
+    tracking.start_vid(vid_path, field_img, frames, max_frames)
 
-    separate_players(frames)
+    game = separate_players_and_ball(frames)
+    stats_players_distance_covered(game.players)
+
+    # for player_number in game.players:
+    #     print(game.players[player_number].distance_covered)

@@ -1,3 +1,5 @@
+import collections
+
 class Line:
     def __init__(self, the_line, degrees):
         # point is (x, y)
@@ -75,8 +77,21 @@ class PlayerSeparated:
     def __init__(self, number):
         self.number = number
         self.location_in_frames = {}
+        self.distance_covered = 0
+
+    def sort_location_in_frames(self):
+        location_in_frames_sorted = collections.OrderedDict(sorted(self.location_in_frames.items()))
+        self.location_in_frames = location_in_frames_sorted
+
+
+class BallSeparated:
+    def __init__(self):
+        self.location_in_frames = {}
 
 
 class Game:
-    def __init__(self, name):
+    def __init__(self, name, players, ball):
         self.name = name
+        self.players = players
+        self.ball = ball
+

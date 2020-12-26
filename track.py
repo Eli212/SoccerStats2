@@ -248,7 +248,7 @@ def detect(opt, save_img=False):
     vid_path = 'sources/TestVideos/vid2.mp4'
     field_imgg = cv2.imread('sources/TestImages/maracana_homemade.png')
     return frames_arr
-    # tracking.start_vid(vid_path, field_imgg, frames_arr)
+    tracking.start_vid(vid_path, field_imgg, frames_arr)
 
     if save_txt or save_img:
         print('Results saved to %s' % os.getcwd() + os.sep + out)
