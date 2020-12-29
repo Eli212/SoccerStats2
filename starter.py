@@ -6,6 +6,7 @@ import track
 import logic.Classes as Classes
 import logic.CONSTS as CONSTS
 import old.tracking as tracking
+import numpy as np
 
 import cv2
 
@@ -72,8 +73,8 @@ def separate_players_and_ball(frames_arr):
                 players_arr[player_number].location_in_frames[idx_frame] = None
 
     # Sort if you want
-    # for player_number in players_arr:
-    #     players_arr[player_number].sort_location_in_frames()
+    for player_number in players_arr:
+        players_arr[player_number].sort_location_in_frames()
 
     return Classes.Game("Maracana", players_arr, ball)
 
@@ -81,10 +82,11 @@ def separate_players_and_ball(frames_arr):
 def stats_players_distance_covered(players_arr):
     for player_number in players_arr:
         for idx_frame in range(CONSTS.MAX_FRAMES - 1):
-            if players_arr[player_number].location_in_frames[idx_frame] is not None:
+            if players_arr[player_number].location_in_frames_perspective[idx_frame] is not None\
+                    and players_arr[player_number].location_in_frames_perspective[idx_frame + 1] is not None:
                 players_arr[player_number].distance_covered += \
-                    euclidean_distance(players_arr[1].location_in_frames[idx_frame],
-                                       players_arr[1].location_in_frames[idx_frame + 1])
+                    euclidean_distance(players_arr[player_number].location_in_frames_perspective[idx_frame],
+                                       players_arr[player_number].location_in_frames_perspective[idx_frame + 1])
         # player_distance = player_distance / 100
 
     for player_number in players_arr:
@@ -97,6 +99,81 @@ def euclidean_distance(point1, point2):
     return dis
 
 
+def change_perspective(game):
+    points = ["B", "Y", "Y2", "C", "P", "Q", "V2", "W2", "VW2"]
+
+    pts1 = np.float32([CONSTS.MARACANA_FIELD_POINTS[points[0]],
+                       CONSTS.MARACANA_FIELD_POINTS[points[1]],
+                       CONSTS.MARACANA_FIELD_POINTS[points[2]],
+                       CONSTS.MARACANA_FIELD_POINTS[points[3]],
+                       CONSTS.MARACANA_FIELD_POINTS[points[4]],
+                       CONSTS.MARACANA_FIELD_POINTS[points[5]],
+                       CONSTS.MARACANA_FIELD_POINTS[points[6]],
+                       CONSTS.MARACANA_FIELD_POINTS[points[7]],
+                       CONSTS.MARACANA_FIELD_POINTS[points[8]]])
+    pts2 = np.float32([CONSTS.MARACANA_HOMEMADE_FIELD_POINTS[points[0]],
+                       CONSTS.MARACANA_HOMEMADE_FIELD_POINTS[points[1]],
+                       CONSTS.MARACANA_HOMEMADE_FIELD_POINTS[points[2]],
+                       CONSTS.MARACANA_HOMEMADE_FIELD_POINTS[points[3]],
+                       CONSTS.MARACANA_HOMEMADE_FIELD_POINTS[points[4]],
+                       CONSTS.MARACANA_HOMEMADE_FIELD_POINTS[points[5]],
+                       CONSTS.MARACANA_HOMEMADE_FIELD_POINTS[points[6]],
+                       CONSTS.MARACANA_HOMEMADE_FIELD_POINTS[points[7]],
+                       CONSTS.MARACANA_HOMEMADE_FIELD_POINTS[points[8]]])
+
+    h, status = cv2.findHomography(pts1, pts2)
+    # im_dst = cv2.warpPerspective(current_frame, h, (field_img.shape[1], field_img.shape[0]))
+    #
+    # initCamera = cv2.initCameraMatrix2D(pts1, pts2, (1090, 1080))
+    # print(initCamera)
+    # matrix = cv2.getPerspectiveTransform(pts1, pts2)
+    for player_number in game.players:
+        for frame_number in game.players[player_number].location_in_frames:
+            if game.players[player_number].location_in_frames[frame_number] is not None:
+                px = (h[0][0] * game.players[player_number].location_in_frames[frame_number][0] + h[0][1] * game.players[player_number].location_in_frames[frame_number][1] + h[0][2]) / (
+                    (h[2][0] * game.players[player_number].location_in_frames[frame_number][0] + h[2][1] * game.players[player_number].location_in_frames[frame_number][1] + h[2][2]))
+                py = (h[1][0] * game.players[player_number].location_in_frames[frame_number][0] + h[1][1] * game.players[player_number].location_in_frames[frame_number][1] + h[1][2]) / (
+                    (h[2][0] * game.players[player_number].location_in_frames[frame_number][0] + h[2][1] * game.players[player_number].location_in_frames[frame_number][1] + h[2][2]))
+                game.players[player_number].location_in_frames_perspective[frame_number] = (int(px), int(py))
+            else:
+                game.players[player_number].location_in_frames_perspective[frame_number] = None
+
+    for frame_number in game.ball.location_in_frames:
+        if game.ball.location_in_frames[frame_number] is not None:
+            px = (h[0][0] * game.ball.location_in_frames[frame_number][0] + h[0][1] * game.ball.location_in_frames[frame_number][1] + h[0][2]) / (
+                (h[2][0] * game.ball.location_in_frames[frame_number][0] + h[2][1] * game.ball.location_in_frames[frame_number][1] + h[2][2]))
+            py = (h[1][0] * game.ball.location_in_frames[frame_number][0] + h[1][1] * game.ball.location_in_frames[frame_number][1] + h[1][2]) / (
+                (h[2][0] * game.ball.location_in_frames[frame_number][0] + h[2][1] * game.ball.location_in_frames[frame_number][1] + h[2][2]))
+            game.ball.location_in_frames_perspective[frame_number] = (int(px), int(py))
+        else:
+            game.ball.location_in_frames_perspective[frame_number] = None
+
+
+def delete_out_of_field_players(players_arr, field_img):
+    players_arr_copy = players_arr.copy()
+    sum_deleted_players = 0
+    for player_number in players_arr:
+        score = 0
+        for frame in players_arr[player_number].location_in_frames:
+            if players_arr[player_number].location_in_frames_perspective[frame] is not None:
+                if check_in_frame(players_arr[player_number].location_in_frames_perspective[frame], field_img.shape):
+                    score += 1
+                else:
+                    score -= 1
+        if score < 0:
+            # print("deleted: " + str(player_number) + " score: " + str(score))
+            sum_deleted_players += 1
+            del players_arr_copy[player_number]
+    print("Deleted {0} players outside of frame".format(sum_deleted_players))
+    return players_arr_copy
+
+
+def check_in_frame(point, frame_shape):
+    if 0 < point[0] < frame_shape[1] and 0 < point[1] < frame_shape[0]:
+        return True
+    return False
+
+
 if __name__ == '__main__':
     max_frames = 178
     vid_path = 'sources/TestVideos/vid2.mp4'
@@ -107,10 +184,13 @@ if __name__ == '__main__':
     # write_frames_to_file(frames, txt_file_name)
 
     frames = read_from_file_to_frame(txt_file_name)
-    tracking.start_vid(vid_path, field_img, frames, max_frames)
+    # tracking.start_vid(vid_path, field_img, frames, max_frames)
 
-    game = separate_players_and_ball(frames)
-    stats_players_distance_covered(game.players)
-
+    maracana_game = separate_players_and_ball(frames)
+    # tracking.start_vid(vid_path, field_img, game, max_frames)
+    change_perspective(maracana_game)
+    maracana_game.players = delete_out_of_field_players(maracana_game.players, field_img)
+    stats_players_distance_covered(maracana_game.players)
+    print(maracana_game.players[5].location_in_frames_perspective)
     # for player_number in game.players:
     #     print(game.players[player_number].distance_covered)
