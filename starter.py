@@ -191,6 +191,6 @@ if __name__ == '__main__':
     change_perspective(maracana_game)
     maracana_game.players = delete_out_of_field_players(maracana_game.players, field_img)
     stats_players_distance_covered(maracana_game.players)
-    print(maracana_game.players[5].location_in_frames_perspective)
+    print(maracana_game.players[92].location_in_frames_perspective)
     # for player_number in game.players:
     #     print(game.players[player_number].distance_covered)
