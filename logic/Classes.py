@@ -76,8 +76,10 @@ class Player:
 class PlayerSeparated:
     def __init__(self, number):
         self.number = number
+
         self.location_in_frames = {}
         self.location_in_frames_perspective = {}
+        self.player_box = {}
         self.distance_covered = 0
 
     def sort_location_in_frames(self):

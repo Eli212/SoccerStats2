@@ -11,7 +11,8 @@ KERNEL_VERY_LIGHT = np.ones((2, 2), np.uint8)
 CIRCLE_RADIUS = 1
 
 # Blue color in BGR
-CIRCLE_COLOR = (255, 0, 0)
+TEAM_A = (255, 0, 0)
+TEAM_B = (80, 127, 255)
 CIRCLE_COLOR2 = (0, 255, 0)
 
 # Line thickness of 2 px
@@ -85,3 +86,4 @@ MARACANA_FIELD_POINTS = {
 }
 
 MAX_FRAMES = 178
+MAX_ZIG_ZAGS = 5
