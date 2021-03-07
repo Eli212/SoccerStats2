@@ -2,6 +2,8 @@
 # from old import tracking
 import logic.outputs as outputs
 import playerteam
+import statistics
+import helpful
 
 import matplotlib.pyplot as plt
 
@@ -39,27 +41,6 @@ def separate_players_and_ball(frames_arr):
     return Classes.Game("Maracana", players_arr, ball)
 
 
-def stats_players_distance_covered(players_arr):
-    for player_number in players_arr:
-        for idx_frame in range(CONSTS.MAX_FRAMES - 1):
-            if players_arr[player_number].location_in_frames_perspective[idx_frame] is not None \
-                    and players_arr[player_number].location_in_frames_perspective[idx_frame + 1] is not None:
-                # if player_number == 21:
-                #     print(euclidean_distance(players_arr[player_number].location_in_frames_perspective[idx_frame],
-                #                        players_arr[player_number].location_in_frames_perspective[idx_frame + 1]))
-                players_arr[player_number].distance_covered += \
-                    euclidean_distance(players_arr[player_number].location_in_frames_perspective[idx_frame],
-                                       players_arr[player_number].location_in_frames_perspective[idx_frame + 1])
-
-    # print stats
-    # for player_number in players_arr:
-    #     print("player - ", players_arr[player_number].number, "  player_distance  - ",
-    #           players_arr[player_number].distance_covered)
-
-
-def euclidean_distance(point1, point2):
-    dis = math.sqrt(((point1[0] - point2[0]) ** 2) + ((point1[1] - point2[1]) ** 2))
-    return dis
 
 
 def change_perspective(game):
@@ -153,7 +134,7 @@ def get_avg_distance_in_frame_of_all_players(game):
             if game.players[player_number].location_in_frames_perspective[idx_frame] is not None \
                     and game.players[player_number].location_in_frames_perspective[idx_frame + 1] is not None:
                 sum_distance += \
-                    euclidean_distance(game.players[player_number].location_in_frames_perspective[idx_frame],
+                    helpful.euclidean_distance(game.players[player_number].location_in_frames_perspective[idx_frame],
                                        game.players[player_number].location_in_frames_perspective[idx_frame + 1])
                 count_of_sums += 1
 
@@ -171,7 +152,7 @@ def fix_players_zig_zags(game, loop_times=1):
             for idx_frame in range(CONSTS.MAX_FRAMES - 1):
                 if game.players[player_number].location_in_frames_perspective[idx_frame] is not None \
                         and game.players[player_number].location_in_frames_perspective[idx_frame + 1] is not None:
-                    if euclidean_distance(game.players[player_number].location_in_frames_perspective[idx_frame],
+                    if helpful.euclidean_distance(game.players[player_number].location_in_frames_perspective[idx_frame],
                                           game.players[player_number].location_in_frames_perspective[idx_frame + 1]) \
                             > CONSTS.MAX_ZIG_ZAGS:
                         # print(midpoint(game.players[player_number].location_in_frames_perspective[idx_frame],
@@ -189,7 +170,6 @@ def identify_players_team(game, vid_path):
         player_avg_color = []
         # do this for avg in case the random frame hits two players in box
         for frame_number in game.players[player_number].player_box:
-            # print(frame_number)
             current_box = game.players[player_number].player_box[frame_number]
             current_box = [int(x) for x in current_box]
             # print(current_box)
@@ -235,7 +215,7 @@ if __name__ == '__main__':
     # tracking.start_vid(vid_path, field_img, game, max_frames)
     change_perspective(maracana_game)
     maracana_game.players = delete_out_of_field_players(maracana_game.players, field_img)
-    stats_players_distance_covered(maracana_game.players)
+    statistics.stats_players_distance_covered(maracana_game.players)
     get_avg_distance_in_frame_of_all_players(maracana_game)
     fix_players_zig_zags(maracana_game, 1000)
     get_avg_distance_in_frame_of_all_players(maracana_game)

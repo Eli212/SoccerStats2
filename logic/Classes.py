@@ -1,5 +1,6 @@
 import collections
 
+
 class Line:
     def __init__(self, the_line, degrees):
         # point is (x, y)
