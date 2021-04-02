@@ -50,6 +50,30 @@ def read_from_file_to_frame(file_name):
     return frames_arr
 
 
+def create_vid_only_ball(ball, field_img):
+    new_vid_name = "{0}.avi".format("ball")
+    cap = cv2.VideoCapture(0)
+    count = 0
+    frame_jump = 1
+    video = cv2.VideoWriter(new_vid_name, 0, 30, (field_img.shape[1], field_img.shape[0]))
+    while count < CONSTS.MAX_FRAMES:
+        field_img_copy = field_img.copy()
+        if count % 30 == 0:
+            print(count)
+        if ball.location_in_frames[count] is not None:
+            field_img_copy = cv2.circle(field_img_copy, ball.location_in_frames_perspective[count],
+                                        CONSTS.CIRCLE_RADIUS, CONSTS.CIRCLE_COLOR2, CONSTS.CIRCLE_THICKNESS)
+            field_img_copy = cv2.putText(field_img_copy, str("B"),
+                                         ball.location_in_frames_perspective[count],
+                                         CONSTS.TEXT_FONT, CONSTS.TEXT_FONTSCALE, CONSTS.TEXT_COLOR,
+                                         CONSTS.TEXT_THICKNESS)
+            video.write(field_img_copy)
+        else:
+            video.write(field_img.copy())
+        count += frame_jump
+        cap.set(1, count)
+
+
 def create_vid_one_player(player, field_img):
     new_vid_name = "{0}.avi".format(player.number)
     cap = cv2.VideoCapture(0)
@@ -62,7 +86,7 @@ def create_vid_one_player(player, field_img):
             print(count)
         if player.location_in_frames_perspective[count] is not None:
             field_img_copy = cv2.circle(field_img_copy, player.location_in_frames_perspective[count],
-                                        CONSTS.CIRCLE_RADIUS, CONSTS.CIRCLE_COLOR, CONSTS.CIRCLE_THICKNESS)
+                                        CONSTS.CIRCLE_RADIUS, CONSTS.CIRCLE_COLOR2, CONSTS.CIRCLE_THICKNESS)
             field_img_copy = cv2.putText(field_img_copy, str(player.number),
                                          player.location_in_frames_perspective[count],
                                          CONSTS.TEXT_FONT, CONSTS.TEXT_FONTSCALE, CONSTS.TEXT_COLOR,
@@ -98,9 +122,15 @@ def create_vid_all_player(game, field_img):
                                              game.players[player_number].location_in_frames_perspective[count],
                                              CONSTS.TEXT_FONT, CONSTS.TEXT_FONTSCALE, CONSTS.TEXT_COLOR,
                                              CONSTS.TEXT_THICKNESS)
-                # video.write(field_img_copy)
-            # else:
-                # video.write(field_img.copy())
+
+        if game.ball.location_in_frames[count] is not None:
+            field_img_copy = cv2.circle(field_img_copy, game.ball.location_in_frames_perspective[count],
+                                        CONSTS.CIRCLE_RADIUS, CONSTS.CIRCLE_COLOR2, CONSTS.CIRCLE_THICKNESS)
+            field_img_copy = cv2.putText(field_img_copy, str("B"),
+                                         game.ball.location_in_frames_perspective[count],
+                                         CONSTS.TEXT_FONT, CONSTS.TEXT_FONTSCALE, CONSTS.TEXT_COLOR,
+                                         CONSTS.TEXT_THICKNESS)
+
         video.write(field_img_copy)
         count += frame_jump
         cap.set(1, count)

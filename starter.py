@@ -41,20 +41,20 @@ def separate_players_and_ball(frames_arr):
     return Classes.Game("Maracana", players_arr, ball)
 
 
-
-
 def change_perspective(game):
     points = ["B", "Y", "Y2", "C", "P", "Q", "V2", "W2", "VW2"]
 
-    pts1 = np.float32([CONSTS.MARACANA_FIELD_POINTS[points[0]],
-                       CONSTS.MARACANA_FIELD_POINTS[points[1]],
-                       CONSTS.MARACANA_FIELD_POINTS[points[2]],
-                       CONSTS.MARACANA_FIELD_POINTS[points[3]],
-                       CONSTS.MARACANA_FIELD_POINTS[points[4]],
-                       CONSTS.MARACANA_FIELD_POINTS[points[5]],
-                       CONSTS.MARACANA_FIELD_POINTS[points[6]],
-                       CONSTS.MARACANA_FIELD_POINTS[points[7]],
-                       CONSTS.MARACANA_FIELD_POINTS[points[8]]])
+    field_points = CONSTS.MARACANA_FIELD_POINTS2
+
+    pts1 = np.float32([field_points[points[0]],
+                       field_points[points[1]],
+                       field_points[points[2]],
+                       field_points[points[3]],
+                       field_points[points[4]],
+                       field_points[points[5]],
+                       field_points[points[6]],
+                       field_points[points[7]],
+                       field_points[points[8]]])
     pts2 = np.float32([CONSTS.MARACANA_HOMEMADE_FIELD_POINTS[points[0]],
                        CONSTS.MARACANA_HOMEMADE_FIELD_POINTS[points[1]],
                        CONSTS.MARACANA_HOMEMADE_FIELD_POINTS[points[2]],
@@ -135,7 +135,8 @@ def get_avg_distance_in_frame_of_all_players(game):
                     and game.players[player_number].location_in_frames_perspective[idx_frame + 1] is not None:
                 sum_distance += \
                     helpful.euclidean_distance(game.players[player_number].location_in_frames_perspective[idx_frame],
-                                       game.players[player_number].location_in_frames_perspective[idx_frame + 1])
+                                               game.players[player_number].location_in_frames_perspective[
+                                                   idx_frame + 1])
                 count_of_sums += 1
 
     # print("Avg distance of all players between each frame: " + str(sum_distance / count_of_sums))
@@ -153,13 +154,29 @@ def fix_players_zig_zags(game, loop_times=1):
                 if game.players[player_number].location_in_frames_perspective[idx_frame] is not None \
                         and game.players[player_number].location_in_frames_perspective[idx_frame + 1] is not None:
                     if helpful.euclidean_distance(game.players[player_number].location_in_frames_perspective[idx_frame],
-                                          game.players[player_number].location_in_frames_perspective[idx_frame + 1]) \
+                                                  game.players[player_number].location_in_frames_perspective[
+                                                      idx_frame + 1]) \
                             > CONSTS.MAX_ZIG_ZAGS:
                         # print(midpoint(game.players[player_number].location_in_frames_perspective[idx_frame],
                         #                game.players[player_number].location_in_frames_perspective[idx_frame + 1]))
                         game.players[player_number].location_in_frames_perspective[idx_frame + 1] = \
                             midpoint(game.players[player_number].location_in_frames_perspective[idx_frame],
                                      game.players[player_number].location_in_frames_perspective[idx_frame + 1])
+
+
+def fix_ball_zig_zags(game, loop_times=1):
+    for _ in range(loop_times):
+        for idx_frame in range(CONSTS.MAX_FRAMES - 1):
+            if game.ball.location_in_frames_perspective[idx_frame] is not None \
+                    and game.ball.location_in_frames_perspective[idx_frame + 1] is not None:
+                if helpful.euclidean_distance(game.ball.location_in_frames_perspective[idx_frame],
+                                              game.ball.location_in_frames_perspective[idx_frame + 1]) \
+                        > CONSTS.MAX_ZIG_ZAGS:
+                    # print(midpoint(game.players[player_number].location_in_frames_perspective[idx_frame],
+                    #                game.players[player_number].location_in_frames_perspective[idx_frame + 1]))
+                    game.ball.location_in_frames_perspective[idx_frame + 1] = \
+                        midpoint(game.ball.location_in_frames_perspective[idx_frame],
+                                 game.ball.location_in_frames_perspective[idx_frame + 1])
 
 
 def identify_players_team(game, vid_path):
@@ -176,21 +193,22 @@ def identify_players_team(game, vid_path):
             cap.set(1, frame_number)
             ret, frame = cap.read()
             frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-            player_frame = frame[current_box[1]:current_box[1]+current_box[2], current_box[0]:int(current_box[0]+current_box[3]/2), :]
+            player_frame = frame[current_box[1]:current_box[1] + current_box[2],
+                           current_box[0]:int(current_box[0] + current_box[3] / 2), :]
             player_dominant_color = playerteam.get_dominant_color(player_frame)
             player_avg_color.append(player_dominant_color)
         # for i in range(3):
-            # player_box_frames_keys = game.players[player_number].player_box.keys()
-            # player_box_random_len = random.randint(0, len(player_box_frames_keys)-1)
-            # player_random_box_frame = list(player_box_frames_keys)[player_box_random_len]
-            # current_box = game.players[player_number].player_box[player_random_box_frame]
-            # current_box = [int(x) for x in current_box]
-            # cap.set(1, player_random_box_frame)
-            # ret, frame = cap.read()
-            # frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-            # player_frame = frame[current_box[1]:current_box[1]+current_box[2], current_box[0]:int(current_box[0]+current_box[3]/2), :]
-            # player_dominant_color = playerteam.get_dominant_color(player_frame)
-            # player_avg_color.append(player_dominant_color)
+        # player_box_frames_keys = game.players[player_number].player_box.keys()
+        # player_box_random_len = random.randint(0, len(player_box_frames_keys)-1)
+        # player_random_box_frame = list(player_box_frames_keys)[player_box_random_len]
+        # current_box = game.players[player_number].player_box[player_random_box_frame]
+        # current_box = [int(x) for x in current_box]
+        # cap.set(1, player_random_box_frame)
+        # ret, frame = cap.read()
+        # frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        # player_frame = frame[current_box[1]:current_box[1]+current_box[2], current_box[0]:int(current_box[0]+current_box[3]/2), :]
+        # player_dominant_color = playerteam.get_dominant_color(player_frame)
+        # player_avg_color.append(player_dominant_color)
         dominant_color_arr.append(playerteam.get_avg_color(player_avg_color))
     teams_arr = playerteam.get_kmeans_teams_arr(dominant_color_arr)
     print(list(game.players.keys()))
@@ -199,10 +217,88 @@ def identify_players_team(game, vid_path):
         game.players[player_number].team = teams_arr[idx]
 
 
+def fill_empty_frames(game):
+    for player_number in game.players:
+        count_frames = 0
+        player_none = 0
+        valid_fill_frames = False
+        while count_frames < CONSTS.MAX_FRAMES:
+            if game.players[player_number].location_in_frames_perspective[count_frames] is None:
+                player_none += 1
+            elif game.players[player_number].location_in_frames_perspective[count_frames] is not None and player_none != 0 and valid_fill_frames:
+                for empty_frame_index in range(0, player_none+1):
+                    current_x = game.players[player_number].location_in_frames_perspective[count_frames
+                                                                                           - player_none - 1
+                                                                                           + empty_frame_index][0] + \
+                                ((game.players[player_number].location_in_frames_perspective[count_frames][0] - \
+                                  game.players[player_number].location_in_frames_perspective[count_frames
+                                                                                             - player_none - 1
+                                                                                             + empty_frame_index][0])
+                                                                                             / player_none
+                                                                                             * empty_frame_index)
+
+                    current_y = game.players[player_number].location_in_frames_perspective[count_frames
+                                                                                           - player_none - 1
+                                                                                           + empty_frame_index][1] + \
+                                ((game.players[player_number].location_in_frames_perspective[count_frames][1] - \
+                                  game.players[player_number].location_in_frames_perspective[count_frames
+                                                                                             - player_none - 1
+                                                                                             + empty_frame_index][1])
+                                 / player_none
+                                 * empty_frame_index)
+                    game.players[player_number].location_in_frames_perspective[count_frames
+                                                                               - player_none + empty_frame_index] = \
+                        (int(current_x), int(current_y))
+
+                player_none = 0
+            else:
+                valid_fill_frames = True
+                player_none = 0
+            count_frames += 1
+
+    # BALL
+    count_frames = 0
+    ball_none = 0
+    valid_fill_frames = False
+    while count_frames < CONSTS.MAX_FRAMES:
+        if game.ball.location_in_frames_perspective[count_frames] is None:
+            ball_none += 1
+        elif game.ball.location_in_frames_perspective[count_frames] is\
+                not None and ball_none != 0 and valid_fill_frames:
+            for empty_frame_index in range(0, ball_none + 1):
+                current_x = game.ball.location_in_frames_perspective[count_frames
+                                                                                       - ball_none - 1
+                                                                                       + empty_frame_index][0] + \
+                            ((game.ball.location_in_frames_perspective[count_frames][0] - \
+                              game.ball.location_in_frames_perspective[count_frames
+                                                                                         - ball_none - 1
+                                                                                         + empty_frame_index][0])
+                             / ball_none
+                             * empty_frame_index)
+
+                current_y = game.ball.location_in_frames_perspective[count_frames
+                                                                                       - ball_none - 1
+                                                                                       + empty_frame_index][1] + \
+                            ((game.ball.location_in_frames_perspective[count_frames][1] - \
+                              game.ball.location_in_frames_perspective[count_frames
+                                                                                         - ball_none - 1
+                                                                                         + empty_frame_index][1])
+                             / ball_none
+                             * empty_frame_index)
+                game.ball.location_in_frames_perspective[count_frames - ball_none + empty_frame_index] = \
+                    (int(current_x), int(current_y))
+
+            ball_none = 0
+        else:
+            valid_fill_frames = True
+            ball_none = 0
+        count_frames += 1
+
+
 if __name__ == '__main__':
     max_frames = 178
     vid_path = 'sources/TestVideos/vid2.mp4'
-    txt_file_name = "demofile2.txt"
+    txt_file_name = "demofile3.txt"
     field_img = cv2.imread('sources/TestImages/maracana_homemade.png')
 
     # frames = track.start_tracking()
@@ -214,13 +310,16 @@ if __name__ == '__main__':
     maracana_game = separate_players_and_ball(frames)
     # tracking.start_vid(vid_path, field_img, game, max_frames)
     change_perspective(maracana_game)
+    fix_ball_zig_zags(maracana_game, 10)
+    outputs.create_vid_only_ball(maracana_game.ball, field_img)
     maracana_game.players = delete_out_of_field_players(maracana_game.players, field_img)
+    fill_empty_frames(maracana_game)
     statistics.stats_players_distance_covered(maracana_game.players)
     get_avg_distance_in_frame_of_all_players(maracana_game)
-    fix_players_zig_zags(maracana_game, 1000)
+    fix_players_zig_zags(maracana_game, 10)
     get_avg_distance_in_frame_of_all_players(maracana_game)
 
-    identify_players_team(maracana_game, vid_path)
+    # identify_players_team(maracana_game, vid_path)
     # save videos:
     # outputs.create_vid_one_player(maracana_game.players[21], field_img)
     outputs.create_vid_all_player(maracana_game, field_img)

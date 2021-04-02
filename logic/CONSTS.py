@@ -85,5 +85,17 @@ MARACANA_FIELD_POINTS = {
     "VW2": (1331, 161)
 }
 
-MAX_FRAMES = 178
-MAX_ZIG_ZAGS = 5
+MARACANA_FIELD_POINTS2 = {
+    "B": (493, 50),
+    "Y": (140, 120),
+    "Y2": (658, 450),
+    "C": (824, 133),
+    "P": (518, 54),
+    "Q": (787, 120),
+    "V2": (613, 74),
+    "W2": (675, 87),
+    "VW2": (639, 80)
+}
+
+MAX_FRAMES = 349
+MAX_ZIG_ZAGS = 0.1
