@@ -267,17 +267,17 @@ def connect_players_to_one(game):
             player_in_frame = False
 
         start_index = 0
-        for idx_frame in range(1, consts.MAX_FRAMES - 1):
+        for idx_frame in range(0, consts.MAX_FRAMES):
             if game.players[player_number].location_in_frames_perspective[idx_frame] is None and player_in_frame:
-                game.players[player_number].in_frame.append((start_index, idx_frame))
-                start_index = idx_frame + 1
+                game.players[player_number].in_frame.append((start_index, idx_frame - 1))
+                start_index = idx_frame
                 player_in_frame = False
                 continue
 
             if game.players[player_number].location_in_frames_perspective[idx_frame] is not None \
                     and not player_in_frame:
-                game.players[player_number].out_frame.append((start_index, idx_frame))
-                start_index = idx_frame + 1
+                game.players[player_number].out_frame.append((start_index, idx_frame - 1))
+                start_index = idx_frame
                 player_in_frame = True
 
         if player_in_frame:
@@ -285,7 +285,49 @@ def connect_players_to_one(game):
         else:
             game.players[player_number].out_frame.append((start_index, idx_frame))
 
+    for player_number in game.players:
+        potential_connections = []
+        for other_player_number in game.players:
+            if player_number != other_player_number and game.players[player_number].is_active \
+                    and game.players[other_player_number].is_active:
+                combined_arr = sorted(game.players[player_number].in_frame + game.players[other_player_number].in_frame,
+                                      key=lambda x: x[1])
+                combined = True
+                for in_frame_idx in range(1, len(combined_arr)):
+                    if combined_arr[in_frame_idx][0] < combined_arr[in_frame_idx-1][1]:
+                        combined = False
+                        break
 
+                if combined:
+                    potential_connections.append(other_player_number)
+        game.players[player_number].potential_identities = potential_connections
+        print("After phase 1 - For player {0}, the potentials are: {1}".format(player_number, potential_connections))
+
+    for player_number in game.players:
+        potential_connections = []
+        for other_player_number in game.players[player_number].potential_identities:
+            for in_frame_player in game.players[player_number].in_frame:
+                for in_frame_other_player in game.players[other_player_number].in_frame:
+                    if in_frame_player[0] > in_frame_other_player[0]:
+                        if helpful.euclidean_distance(game.players[player_number].location_in_frames_perspective[in_frame_player[0]],
+                                                      game.players[other_player_number].location_in_frames_perspective[in_frame_other_player[1]])\
+                                                      < 50:
+                            potential_connections.append(other_player_number)
+                            connect_players(game, player_number, potential_connections)
+                    else:
+                        if helpful.euclidean_distance(game.players[player_number].location_in_frames_perspective[in_frame_player[1]],
+                                                      game.players[other_player_number].location_in_frames_perspective[in_frame_other_player[0]]) \
+                                                      < 50:
+                            potential_connections.append(other_player_number)
+                            connect_players(game, player_number, potential_connections)
+        print("After phase 2 - For player {0}, the potentials are: {1}".format(player_number, potential_connections))
+
+
+def connect_players(game, player_number, connections):
+    # TODO: connect the location_in_frames_perspective of the connections!
+    pass
+    # for connection in connections:
+    #     game.players[player_number]
 
 
 if __name__ == '__main__':

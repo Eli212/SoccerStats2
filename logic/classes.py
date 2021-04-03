@@ -85,6 +85,7 @@ class PlayerSeparated:
         self.is_active = True
         self.in_frame = []
         self.out_frame = []
+        self.potential_identities = []
 
     def sort_location_in_frames(self):
         location_in_frames_sorted = collections.OrderedDict(sorted(self.location_in_frames.items()))
