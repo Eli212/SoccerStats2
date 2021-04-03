@@ -60,7 +60,7 @@ def create_vid_only_ball(ball, field_img):
         field_img_copy = field_img.copy()
         if count % 30 == 0:
             print(count)
-        if ball.location_in_frames[count] is not None:
+        if ball.location_in_frames_perspective[count] is not None:
             field_img_copy = cv2.circle(field_img_copy, ball.location_in_frames_perspective[count],
                                         CONSTS.CIRCLE_RADIUS, CONSTS.CIRCLE_COLOR2, CONSTS.CIRCLE_THICKNESS)
             field_img_copy = cv2.putText(field_img_copy, str("B"),
@@ -123,7 +123,7 @@ def create_vid_all_player(game, field_img):
                                              CONSTS.TEXT_FONT, CONSTS.TEXT_FONTSCALE, CONSTS.TEXT_COLOR,
                                              CONSTS.TEXT_THICKNESS)
 
-        if game.ball.location_in_frames[count] is not None:
+        if game.ball.location_in_frames_perspective[count] is not None:
             field_img_copy = cv2.circle(field_img_copy, game.ball.location_in_frames_perspective[count],
                                         CONSTS.CIRCLE_RADIUS, CONSTS.CIRCLE_COLOR2, CONSTS.CIRCLE_THICKNESS)
             field_img_copy = cv2.putText(field_img_copy, str("B"),

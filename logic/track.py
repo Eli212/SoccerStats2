@@ -249,8 +249,8 @@ def detect(opt, save_img=False):
 
         # if frame_num == 5:
         #     break
-    vid_path = 'sources/TestVideos/vid2.mp4'
-    field_imgg = cv2.imread('sources/TestImages/maracana_homemade.png')
+    vid_path = '../sources/TestVideos/vid2.mp4'
+    field_imgg = cv2.imread('../sources/TestImages/maracana_homemade.png')
     return frames_arr
     tracking.start_vid(vid_path, field_imgg, frames_arr)
 
@@ -274,9 +274,9 @@ def start_tracking(vid_path):
     parser.add_argument('--img-size', type=int, default=854,
                         help='inference size (pixels)')
     parser.add_argument('--conf-thres', type=float,
-                        default=0.4, help='object confidence threshold')
+                        default=0.1, help='object confidence threshold')
     parser.add_argument('--iou-thres', type=float,
-                        default=0.5, help='IOU threshold for NMS')
+                        default=0.2, help='IOU threshold for NMS')
     parser.add_argument('--fourcc', type=str, default='mp4v',
                         help='output video codec (verify ffmpeg support)')
     parser.add_argument('--device', default='',

@@ -19,10 +19,10 @@ CIRCLE_COLOR2 = (0, 255, 0)
 CIRCLE_THICKNESS = 10
 
 # Text Consts
-# font
+# Font
 TEXT_FONT = cv2.FONT_HERSHEY_SIMPLEX
 
-# fontScale
+# Font Scale
 TEXT_FONTSCALE = 0.5
 
 # Red color in BGR
@@ -97,5 +97,7 @@ MARACANA_FIELD_POINTS2 = {
     "VW2": (639, 80)
 }
 
+# Game Maxes
 MAX_FRAMES = 349
-MAX_ZIG_ZAGS = 0.1
+MAX_PLAYER_ZIG_ZAGS = 0.1
+MAX_BALL_JUMPING = 250

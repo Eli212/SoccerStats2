@@ -1,8 +1,7 @@
 # import track
 # from old import tracking
 import logic.outputs as outputs
-import statistics
-from logic import helpful, playerteam
+from logic import helpful, playerteam, statistics, track
 
 import logic.Classes as Classes
 import logic.CONSTS as CONSTS
@@ -89,7 +88,12 @@ def change_perspective(game):
                   game.ball.location_in_frames[frame_number][1] + h[1][2]) / (
                      (h[2][0] * game.ball.location_in_frames[frame_number][0] + h[2][1] *
                       game.ball.location_in_frames[frame_number][1] + h[2][2]))
-            game.ball.location_in_frames_perspective[frame_number] = (int(px), int(py))
+
+            # set location to None if it out of boundaries
+            if int(px) < 0 or int(py) < 0:
+                game.ball.location_in_frames_perspective[frame_number] = None
+            else:
+                game.ball.location_in_frames_perspective[frame_number] = (int(px), int(py))
         else:
             game.ball.location_in_frames_perspective[frame_number] = None
 
@@ -149,7 +153,7 @@ def fix_players_zig_zags(game, loop_times=1):
                     if helpful.euclidean_distance(game.players[player_number].location_in_frames_perspective[idx_frame],
                                                   game.players[player_number].location_in_frames_perspective[
                                                       idx_frame + 1]) \
-                            > CONSTS.MAX_ZIG_ZAGS:
+                            > CONSTS.MAX_PLAYER_ZIG_ZAGS:
                         # print(midpoint(game.players[player_number].location_in_frames_perspective[idx_frame],
                         #                game.players[player_number].location_in_frames_perspective[idx_frame + 1]))
                         game.players[player_number].location_in_frames_perspective[idx_frame + 1] = \
@@ -164,7 +168,7 @@ def fix_ball_zig_zags(game, loop_times=1):
                     and game.ball.location_in_frames_perspective[idx_frame + 1] is not None:
                 if helpful.euclidean_distance(game.ball.location_in_frames_perspective[idx_frame],
                                               game.ball.location_in_frames_perspective[idx_frame + 1]) \
-                        > CONSTS.MAX_ZIG_ZAGS:
+                        > CONSTS.MAX_PLAYER_ZIG_ZAGS:
                     # print(midpoint(game.players[player_number].location_in_frames_perspective[idx_frame],
                     #                game.players[player_number].location_in_frames_perspective[idx_frame + 1]))
                     game.ball.location_in_frames_perspective[idx_frame + 1] = \
@@ -258,53 +262,60 @@ def fill_empty_frames(game):
             ball_none += 1
         elif game.ball.location_in_frames_perspective[count_frames] is\
                 not None and ball_none != 0 and valid_fill_frames:
-            for empty_frame_index in range(0, ball_none + 1):
-                current_x = game.ball.location_in_frames_perspective[count_frames
-                                                                                       - ball_none - 1
-                                                                                       + empty_frame_index][0] + \
-                            ((game.ball.location_in_frames_perspective[count_frames][0] - \
-                              game.ball.location_in_frames_perspective[count_frames
-                                                                                         - ball_none - 1
-                                                                                         + empty_frame_index][0])
-                             / ball_none
-                             * empty_frame_index)
+            if helpful.euclidean_distance(
+                    game.ball.location_in_frames_perspective[count_frames - ball_none - 1],
+                    game.ball.location_in_frames_perspective[count_frames]) < CONSTS.MAX_BALL_JUMPING:
+                for empty_frame_index in range(0, ball_none + 1):
+                    current_x = game.ball.location_in_frames_perspective[count_frames
+                                                                                           - ball_none - 1
+                                                                                           + empty_frame_index][0] + \
+                                ((game.ball.location_in_frames_perspective[count_frames][0] - \
+                                  game.ball.location_in_frames_perspective[count_frames
+                                                                                             - ball_none - 1
+                                                                                             + empty_frame_index][0])
+                                 / ball_none
+                                 * empty_frame_index)
 
-                current_y = game.ball.location_in_frames_perspective[count_frames
-                                                                                       - ball_none - 1
-                                                                                       + empty_frame_index][1] + \
-                            ((game.ball.location_in_frames_perspective[count_frames][1] - \
-                              game.ball.location_in_frames_perspective[count_frames
-                                                                                         - ball_none - 1
-                                                                                         + empty_frame_index][1])
-                             / ball_none
-                             * empty_frame_index)
-                game.ball.location_in_frames_perspective[count_frames - ball_none + empty_frame_index] = \
-                    (int(current_x), int(current_y))
+                    current_y = game.ball.location_in_frames_perspective[count_frames
+                                                                                           - ball_none - 1
+                                                                                           + empty_frame_index][1] + \
+                                ((game.ball.location_in_frames_perspective[count_frames][1] - \
+                                  game.ball.location_in_frames_perspective[count_frames
+                                                                                             - ball_none - 1
+                                                                                             + empty_frame_index][1])
+                                 / ball_none
+                                 * empty_frame_index)
+                    game.ball.location_in_frames_perspective[count_frames - ball_none + empty_frame_index] = \
+                        (int(current_x), int(current_y))
 
-            ball_none = 0
+                ball_none = 0
+            else:
+                game.ball.location_in_frames_perspective[count_frames] = None
+                ball_none += 1
         else:
             valid_fill_frames = True
             ball_none = 0
         count_frames += 1
+    print("aa")
 
 
 if __name__ == '__main__':
     max_frames = 178
-    vid_path = 'sources/TestVideos/vid3.mp4'
-    txt_file_name = "outputs/textfiles/demofile3.txt"
+    video_path = 'sources/TestVideos/vid3.mp4'
+    txt_file_name = "outputs/textfiles/demofile4.txt"
     field_img = cv2.imread('sources/TestImages/maracana_homemade.png')
 
-    # frames = track.start_tracking(vid_path)
-    # outputs.write_frames_to_file(frames, txt_file_name)
+    frames = track.start_tracking(video_path)
+    outputs.write_frames_to_file(frames, txt_file_name)
 
     frames = outputs.read_from_file_to_frame(txt_file_name)
-    # tracking.start_vid(vid_path, field_img, frames, max_frames)
+    # tracking.start_vid(video_path, field_img, frames, max_frames)
 
     maracana_game = separate_players_and_ball(frames)
-    # tracking.start_vid(vid_path, field_img, game, max_frames)
+    # tracking.start_vid(video_path, field_img, game, max_frames)
     change_perspective(maracana_game)
     fill_empty_frames(maracana_game)
-    fix_ball_zig_zags(maracana_game, 10)
+    # fix_ball_zig_zags(maracana_game, 10)
 
     # outputs.create_vid_only_ball(maracana_game.ball, field_img)
 
