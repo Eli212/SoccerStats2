@@ -1,5 +1,5 @@
 import sys
-import logic.Classes as CLASSES
+import logic.classes as classes
 from old import tracking
 
 from yolov5.utils.datasets import LoadImages, LoadStreams
@@ -194,7 +194,7 @@ def detect(opt, save_img=False):
                         lt_y = current_bbox_xyxy[1]
                         box_height = abs(current_bbox_xyxy[1] - current_bbox_xyxy[3])
                         box_width = abs(current_bbox_xyxy[0] - current_bbox_xyxy[2])
-                        new_player = CLASSES.Player(identities[idx], lt_x, lt_y, box_height, box_width, mid_x, mid_y)
+                        new_player = classes.Player(identities[idx], lt_x, lt_y, box_height, box_width, mid_x, mid_y)
                         players_arr.append(new_player)
                 #     draw_boxes(im0, bbox_xyxy, identities)
 
@@ -246,7 +246,7 @@ def detect(opt, save_img=False):
             #             vid_writer = cv2.VideoWriter(
             #                 save_path, cv2.VideoWriter_fourcc(*opt.fourcc), fps, (w, h))
             #         vid_writer.write(im0)
-        current_frame = CLASSES.Frame(frame_num, players_arr)
+        current_frame = classes.Frame(frame_num, players_arr)
         current_frame.ball = new_ball
         frame_num += 1
         frames_arr.append(current_frame)

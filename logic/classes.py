@@ -77,12 +77,14 @@ class Player:
 class PlayerSeparated:
     def __init__(self, number):
         self.number = number
-
         self.location_in_frames = {}
         self.location_in_frames_perspective = {}
         self.player_box = {}
         self.distance_covered = 0
         self.team = 0
+        self.is_active = True
+        self.in_frame = []
+        self.out_frame = []
 
     def sort_location_in_frames(self):
         location_in_frames_sorted = collections.OrderedDict(sorted(self.location_in_frames.items()))

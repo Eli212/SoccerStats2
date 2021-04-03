@@ -3,8 +3,8 @@
 import logic.outputs as outputs
 from logic import helpful, playerteam, statistics, track
 
-import logic.Classes as Classes
-import logic.CONSTS as CONSTS
+import logic.classes as classes
+import logic.consts as consts
 import numpy as np
 
 import cv2
@@ -12,17 +12,17 @@ import cv2
 
 def separate_players_and_ball(frames_arr):
     players_arr = {}
-    ball = Classes.BallSeparated()
+    ball = classes.BallSeparated()
     for idx_frame, frame in enumerate(frames_arr):
         for player in frame.players:
             if player.number not in players_arr:
-                players_arr[player.number] = Classes.PlayerSeparated(player.number)
+                players_arr[player.number] = classes.PlayerSeparated(player.number)
             players_arr[player.number].location_in_frames[idx_frame] = (player.point_x, player.point_y)
             players_arr[player.number].player_box[idx_frame] = [player.tl_x, player.tl_y, player.height, player.width]
         ball.location_in_frames[idx_frame] = frame.ball
 
     for player_number in players_arr:
-        for idx_frame in range(CONSTS.MAX_FRAMES):
+        for idx_frame in range(consts.MAX_FRAMES):
             if idx_frame not in players_arr[player_number].location_in_frames:
                 players_arr[player_number].location_in_frames[idx_frame] = None
 
@@ -30,13 +30,13 @@ def separate_players_and_ball(frames_arr):
     for player_number in players_arr:
         players_arr[player_number].sort_location_in_frames()
 
-    return Classes.Game("Maracana", players_arr, ball)
+    return classes.Game("Maracana", players_arr, ball)
 
 
 def change_perspective(game):
     points = ["B", "Y", "Y2", "C", "P", "Q", "V2", "W2", "VW2"]
 
-    field_points = CONSTS.MARACANA_FIELD_POINTS2
+    field_points = consts.MARACANA_FIELD_POINTS2
 
     pts1 = np.float32([field_points[points[0]],
                        field_points[points[1]],
@@ -47,15 +47,15 @@ def change_perspective(game):
                        field_points[points[6]],
                        field_points[points[7]],
                        field_points[points[8]]])
-    pts2 = np.float32([CONSTS.MARACANA_HOMEMADE_FIELD_POINTS[points[0]],
-                       CONSTS.MARACANA_HOMEMADE_FIELD_POINTS[points[1]],
-                       CONSTS.MARACANA_HOMEMADE_FIELD_POINTS[points[2]],
-                       CONSTS.MARACANA_HOMEMADE_FIELD_POINTS[points[3]],
-                       CONSTS.MARACANA_HOMEMADE_FIELD_POINTS[points[4]],
-                       CONSTS.MARACANA_HOMEMADE_FIELD_POINTS[points[5]],
-                       CONSTS.MARACANA_HOMEMADE_FIELD_POINTS[points[6]],
-                       CONSTS.MARACANA_HOMEMADE_FIELD_POINTS[points[7]],
-                       CONSTS.MARACANA_HOMEMADE_FIELD_POINTS[points[8]]])
+    pts2 = np.float32([consts.MARACANA_HOMEMADE_FIELD_POINTS[points[0]],
+                       consts.MARACANA_HOMEMADE_FIELD_POINTS[points[1]],
+                       consts.MARACANA_HOMEMADE_FIELD_POINTS[points[2]],
+                       consts.MARACANA_HOMEMADE_FIELD_POINTS[points[3]],
+                       consts.MARACANA_HOMEMADE_FIELD_POINTS[points[4]],
+                       consts.MARACANA_HOMEMADE_FIELD_POINTS[points[5]],
+                       consts.MARACANA_HOMEMADE_FIELD_POINTS[points[6]],
+                       consts.MARACANA_HOMEMADE_FIELD_POINTS[points[7]],
+                       consts.MARACANA_HOMEMADE_FIELD_POINTS[points[8]]])
 
     h, status = cv2.findHomography(pts1, pts2)
     # im_dst = cv2.warpPerspective(current_frame, h, (field_img.shape[1], field_img.shape[0]))
@@ -126,13 +126,13 @@ def check_in_frame(point, frame_shape):
 def fix_players_zig_zags(game, loop_times=1):
     for _ in range(loop_times):
         for player_number in game.players:
-            for idx_frame in range(CONSTS.MAX_FRAMES - 1):
+            for idx_frame in range(consts.MAX_FRAMES - 1):
                 if game.players[player_number].location_in_frames_perspective[idx_frame] is not None \
                         and game.players[player_number].location_in_frames_perspective[idx_frame + 1] is not None:
                     if helpful.euclidean_distance(game.players[player_number].location_in_frames_perspective[idx_frame],
                                                   game.players[player_number].location_in_frames_perspective[
                                                       idx_frame + 1]) \
-                            > CONSTS.MAX_PLAYER_ZIG_ZAGS:
+                            > consts.MAX_PLAYER_ZIG_ZAGS:
                         # print(midpoint(game.players[player_number].location_in_frames_perspective[idx_frame],
                         #                game.players[player_number].location_in_frames_perspective[idx_frame + 1]))
                         game.players[player_number].location_in_frames_perspective[idx_frame + 1] = \
@@ -142,55 +142,17 @@ def fix_players_zig_zags(game, loop_times=1):
 
 def fix_ball_zig_zags(game, loop_times=1):
     for _ in range(loop_times):
-        for idx_frame in range(CONSTS.MAX_FRAMES - 1):
+        for idx_frame in range(consts.MAX_FRAMES - 1):
             if game.ball.location_in_frames_perspective[idx_frame] is not None \
                     and game.ball.location_in_frames_perspective[idx_frame + 1] is not None:
                 if helpful.euclidean_distance(game.ball.location_in_frames_perspective[idx_frame],
                                               game.ball.location_in_frames_perspective[idx_frame + 1]) \
-                        > CONSTS.MAX_PLAYER_ZIG_ZAGS:
+                        > consts.MAX_PLAYER_ZIG_ZAGS:
                     # print(midpoint(game.players[player_number].location_in_frames_perspective[idx_frame],
                     #                game.players[player_number].location_in_frames_perspective[idx_frame + 1]))
                     game.ball.location_in_frames_perspective[idx_frame + 1] = \
                         helpful.midpoint(game.ball.location_in_frames_perspective[idx_frame],
                                          game.ball.location_in_frames_perspective[idx_frame + 1])
-
-
-def identify_players_team(game, vid_path):
-    cap = cv2.VideoCapture(vid_path)
-    dominant_color_arr = []
-    for player_number in game.players:
-        print(player_number)
-        player_avg_color = []
-        # do this for avg in case the random frame hits two players in box
-        for frame_number in game.players[player_number].player_box:
-            current_box = game.players[player_number].player_box[frame_number]
-            current_box = [int(x) for x in current_box]
-            # print(current_box)
-            cap.set(1, frame_number)
-            ret, frame = cap.read()
-            frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-            player_frame = frame[current_box[1]:current_box[1] + current_box[2],
-                                 current_box[0]:int(current_box[0] + current_box[3] / 2), :]
-            player_dominant_color = playerteam.get_dominant_color(player_frame)
-            player_avg_color.append(player_dominant_color)
-        # for i in range(3):
-        # player_box_frames_keys = game.players[player_number].player_box.keys()
-        # player_box_random_len = random.randint(0, len(player_box_frames_keys)-1)
-        # player_random_box_frame = list(player_box_frames_keys)[player_box_random_len]
-        # current_box = game.players[player_number].player_box[player_random_box_frame]
-        # current_box = [int(x) for x in current_box]
-        # cap.set(1, player_random_box_frame)
-        # ret, frame = cap.read()
-        # frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-        # player_frame = frame[current_box[1]:current_box[1]+current_box[2], current_box[0]:int(current_box[0]+current_box[3]/2), :]
-        # player_dominant_color = playerteam.get_dominant_color(player_frame)
-        # player_avg_color.append(player_dominant_color)
-        dominant_color_arr.append(playerteam.get_avg_color(player_avg_color))
-    teams_arr = playerteam.get_kmeans_teams_arr(dominant_color_arr)
-    print(list(game.players.keys()))
-    print(teams_arr)
-    for idx, player_number in enumerate(game.players):
-        game.players[player_number].team = teams_arr[idx]
 
 
 def fill_empty_frames(game):
@@ -199,7 +161,7 @@ def fill_empty_frames(game):
         count_frames = 0
         player_none = 0
         valid_fill_frames = False
-        while count_frames < CONSTS.MAX_FRAMES:
+        while count_frames < consts.MAX_FRAMES:
             if game.players[player_number].location_in_frames_perspective[count_frames] is None:
                 player_none += 1
             elif game.players[player_number].location_in_frames_perspective[count_frames] is not\
@@ -207,7 +169,7 @@ def fill_empty_frames(game):
                 if helpful.euclidean_distance(
                         game.players[player_number].location_in_frames_perspective[count_frames - player_none - 1],
                         game.players[player_number].location_in_frames_perspective[count_frames]) < \
-                        CONSTS.MAX_PLAYER_JUMPING:
+                        consts.MAX_PLAYER_JUMPING:
                     for empty_frame_index in range(0, player_none + 1):
                         current_x = game.players[player_number].location_in_frames_perspective[count_frames
                                                                                                - player_none - 1
@@ -245,14 +207,14 @@ def fill_empty_frames(game):
     count_frames = 0
     ball_none = 0
     valid_fill_frames = False
-    while count_frames < CONSTS.MAX_FRAMES:
+    while count_frames < consts.MAX_FRAMES:
         if game.ball.location_in_frames_perspective[count_frames] is None:
             ball_none += 1
         elif game.ball.location_in_frames_perspective[count_frames] is \
                 not None and ball_none != 0 and valid_fill_frames:
             if helpful.euclidean_distance(
                     game.ball.location_in_frames_perspective[count_frames - ball_none - 1],
-                    game.ball.location_in_frames_perspective[count_frames]) < CONSTS.MAX_BALL_JUMPING:
+                    game.ball.location_in_frames_perspective[count_frames]) < consts.MAX_BALL_JUMPING:
                 for empty_frame_index in range(0, ball_none + 1):
                     current_x = game.ball.location_in_frames_perspective[count_frames
                                                                          - ball_none - 1
@@ -286,8 +248,48 @@ def fill_empty_frames(game):
         count_frames += 1
 
 
+def remove_irrelevant_players(game):
+    for player_number in game.players:
+        count_player_appearance = 0
+        for idx_frame in range(consts.MAX_FRAMES - 1):
+            if game.players[player_number].location_in_frames_perspective[idx_frame] is not None:
+                count_player_appearance += 1
+        if count_player_appearance < consts.MAX_FRAMES/5:
+            game.players[player_number].is_active = False
+            print("Removed player {0} for being inactive".format(player_number))
+
+
+def connect_players_to_one(game):
+    for player_number in game.players:
+        player_in_frame = True
+        # Check if player is in the frame in frame 0
+        if game.players[player_number].location_in_frames_perspective[0] is None:
+            player_in_frame = False
+
+        start_index = 0
+        for idx_frame in range(1, consts.MAX_FRAMES - 1):
+            if game.players[player_number].location_in_frames_perspective[idx_frame] is None and player_in_frame:
+                game.players[player_number].in_frame.append((start_index, idx_frame))
+                start_index = idx_frame + 1
+                player_in_frame = False
+                continue
+
+            if game.players[player_number].location_in_frames_perspective[idx_frame] is not None \
+                    and not player_in_frame:
+                game.players[player_number].out_frame.append((start_index, idx_frame))
+                start_index = idx_frame + 1
+                player_in_frame = True
+
+        if player_in_frame:
+            game.players[player_number].in_frame.append((start_index, idx_frame))
+        else:
+            game.players[player_number].out_frame.append((start_index, idx_frame))
+
+
+
+
 if __name__ == '__main__':
-    # max_frames = 178
+    # Path ###
     video_path = 'sources/TestVideos/vid3.mp4'
     txt_file_name = "outputs/textfiles/demofile5.txt"
     field_image = cv2.imread('sources/TestImages/maracana_homemade.png')
@@ -302,11 +304,14 @@ if __name__ == '__main__':
     # Game cleaning and filtering ###
     maracana_game = separate_players_and_ball(frames)
     change_perspective(maracana_game)
+
+    remove_irrelevant_players(maracana_game)
+    connect_players_to_one(maracana_game)
     fill_empty_frames(maracana_game)
     fix_ball_zig_zags(maracana_game, 2)
     maracana_game.players = delete_out_of_field_players(maracana_game.players, field_image)
     fix_players_zig_zags(maracana_game, 2)
-    # identify_players_team(maracana_game, video_path)
+    # playerteam.identify_players_team(maracana_game, video_path)
 
     # Outputs ###
     # outputs.create_vid_only_ball(maracana_game.ball, field_img)

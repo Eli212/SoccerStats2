@@ -41,6 +41,44 @@ def get_avg_color(colors_arr):
     new_rgb = [int(r/colors_arr_len), int(g/colors_arr_len), int(b/colors_arr_len)]
     return new_rgb
 
+
+def identify_players_team(game, vid_path):
+    cap = cv2.VideoCapture(vid_path)
+    dominant_color_arr = []
+    for player_number in game.players:
+        print("Computing player {0} team".format(player_number))
+        player_avg_color = []
+        # do this for avg in case the random frame hits two players in box
+        for frame_number in game.players[player_number].player_box:
+            current_box = game.players[player_number].player_box[frame_number]
+            current_box = [int(x) for x in current_box]
+            # print(current_box)
+            cap.set(1, frame_number)
+            ret, frame = cap.read()
+            frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+            player_frame = frame[current_box[1]:current_box[1] + current_box[2],
+                                 current_box[0]:int(current_box[0] + current_box[3] / 2), :]
+            player_dominant_color = get_dominant_color(player_frame)
+            player_avg_color.append(player_dominant_color)
+        # for i in range(3):
+        # player_box_frames_keys = game.players[player_number].player_box.keys()
+        # player_box_random_len = random.randint(0, len(player_box_frames_keys)-1)
+        # player_random_box_frame = list(player_box_frames_keys)[player_box_random_len]
+        # current_box = game.players[player_number].player_box[player_random_box_frame]
+        # current_box = [int(x) for x in current_box]
+        # cap.set(1, player_random_box_frame)
+        # ret, frame = cap.read()
+        # frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        # player_frame = frame[current_box[1]:current_box[1]+current_box[2], current_box[0]:int(current_box[0]+current_box[3]/2), :]
+        # player_dominant_color = playerteam.get_dominant_color(player_frame)
+        # player_avg_color.append(player_dominant_color)
+        dominant_color_arr.append(get_avg_color(player_avg_color))
+    teams_arr = get_kmeans_teams_arr(dominant_color_arr)
+    print(list(game.players.keys()))
+    print(teams_arr)
+    for idx, player_number in enumerate(game.players):
+        game.players[player_number].team = teams_arr[idx]
+
 # player_img_green1 = cv2.imread("sources/TestImages/green1.png")
 # player_img_green1 = cv2.cvtColor(player_img_green1, cv2.COLOR_BGR2RGB)
 # dom_color_green1 = get_dominant_color(player_img_green1)

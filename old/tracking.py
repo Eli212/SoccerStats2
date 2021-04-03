@@ -1,8 +1,8 @@
 # from utils.detect_and_track import utils
 # from utils.detect_and_track.models import *
 # from ..utils.detect_and_track.sort import *
-import logic.Classes as Classes
-import logic.CONSTS as CONSTS
+import logic.classes as classes
+import logic.consts as consts
 
 import torch
 from torchvision import transforms
@@ -116,7 +116,7 @@ def run_each_frame(video_path):
                     y1 = int(((y1 - pad_y // 2) / unpad_h) * img.shape[0])
                     x1 = int(((x1 - pad_x // 2) / unpad_w) * img.shape[1])
 
-                    player = Classes.Player(int(obj_id), x1, y1, box_h, box_w, int(x1 + box_w/2), int(y1 + box_h/2))
+                    player = classes.Player(int(obj_id), x1, y1, box_h, box_w, int(x1 + box_w / 2), int(y1 + box_h / 2))
                     players.append(player)
 
                     color = colors[int(obj_id) % len(colors)]
@@ -148,7 +148,7 @@ def run_each_frame(video_path):
                 plt.imshow(current_frame_copy)
                 plt.show()
 
-        current_frame = Classes.Frame(ii, players)
+        current_frame = classes.Frame(ii, players)
         current_frame.ball = ball_point
         frames_arr.append(current_frame)
 
@@ -160,24 +160,24 @@ def testing_changing_perspective(the_frame, field_img):
 
     points = ["B", "Y", "Y2", "C", "P", "Q", "V2", "W2", "VW2"]
 
-    pts1 = numpy.float32([CONSTS.MARACANA_FIELD_POINTS[points[0]],
-                       CONSTS.MARACANA_FIELD_POINTS[points[1]],
-                       CONSTS.MARACANA_FIELD_POINTS[points[2]],
-                       CONSTS.MARACANA_FIELD_POINTS[points[3]],
-                       CONSTS.MARACANA_FIELD_POINTS[points[4]],
-                       CONSTS.MARACANA_FIELD_POINTS[points[5]],
-                       CONSTS.MARACANA_FIELD_POINTS[points[6]],
-                       CONSTS.MARACANA_FIELD_POINTS[points[7]],
-                       CONSTS.MARACANA_FIELD_POINTS[points[8]]])
-    pts2 = numpy.float32([CONSTS.MARACANA_HOMEMADE_FIELD_POINTS[points[0]],
-                       CONSTS.MARACANA_HOMEMADE_FIELD_POINTS[points[1]],
-                       CONSTS.MARACANA_HOMEMADE_FIELD_POINTS[points[2]],
-                       CONSTS.MARACANA_HOMEMADE_FIELD_POINTS[points[3]],
-                       CONSTS.MARACANA_HOMEMADE_FIELD_POINTS[points[4]],
-                       CONSTS.MARACANA_HOMEMADE_FIELD_POINTS[points[5]],
-                       CONSTS.MARACANA_HOMEMADE_FIELD_POINTS[points[6]],
-                       CONSTS.MARACANA_HOMEMADE_FIELD_POINTS[points[7]],
-                       CONSTS.MARACANA_HOMEMADE_FIELD_POINTS[points[8]]])
+    pts1 = numpy.float32([consts.MARACANA_FIELD_POINTS[points[0]],
+                          consts.MARACANA_FIELD_POINTS[points[1]],
+                          consts.MARACANA_FIELD_POINTS[points[2]],
+                          consts.MARACANA_FIELD_POINTS[points[3]],
+                          consts.MARACANA_FIELD_POINTS[points[4]],
+                          consts.MARACANA_FIELD_POINTS[points[5]],
+                          consts.MARACANA_FIELD_POINTS[points[6]],
+                          consts.MARACANA_FIELD_POINTS[points[7]],
+                          consts.MARACANA_FIELD_POINTS[points[8]]])
+    pts2 = numpy.float32([consts.MARACANA_HOMEMADE_FIELD_POINTS[points[0]],
+                          consts.MARACANA_HOMEMADE_FIELD_POINTS[points[1]],
+                          consts.MARACANA_HOMEMADE_FIELD_POINTS[points[2]],
+                          consts.MARACANA_HOMEMADE_FIELD_POINTS[points[3]],
+                          consts.MARACANA_HOMEMADE_FIELD_POINTS[points[4]],
+                          consts.MARACANA_HOMEMADE_FIELD_POINTS[points[5]],
+                          consts.MARACANA_HOMEMADE_FIELD_POINTS[points[6]],
+                          consts.MARACANA_HOMEMADE_FIELD_POINTS[points[7]],
+                          consts.MARACANA_HOMEMADE_FIELD_POINTS[points[8]]])
 
     # M = cv2.getAffineTransform(pts2, pts1)
     h, status = cv2.findHomography(pts1, pts2)
@@ -193,10 +193,10 @@ def testing_changing_perspective(the_frame, field_img):
         py = (h[1][0] * player.point_x + h[1][1] * player.point_y + h[1][2]) / (
             (h[2][0] * player.point_x + h[2][1] * player.point_y + h[2][2]))
         player_point = (int(px), int(py))
-        field_img_copy = cv2.circle(field_img_copy, player_point, CONSTS.CIRCLE_RADIUS, CONSTS.CIRCLE_COLOR,
-                                    CONSTS.CIRCLE_THICKNESS)
+        field_img_copy = cv2.circle(field_img_copy, player_point, consts.CIRCLE_RADIUS, consts.CIRCLE_COLOR,
+                                    consts.CIRCLE_THICKNESS)
         field_img_copy = cv2.putText(field_img_copy, str(player.number), player_point,
-                                     CONSTS.TEXT_FONT, CONSTS.TEXT_FONTSCALE, CONSTS.TEXT_COLOR, CONSTS.TEXT_THICKNESS)
+                                     consts.TEXT_FONT, consts.TEXT_FONTSCALE, consts.TEXT_COLOR, consts.TEXT_THICKNESS)
 
     if the_frame.ball is not None:
         px = (h[0][0] * the_frame.ball[0] + h[0][1] * the_frame.ball[1] + h[0][2]) / (
@@ -204,8 +204,8 @@ def testing_changing_perspective(the_frame, field_img):
         py = (h[1][0] * the_frame.ball[0] + h[1][1] * the_frame.ball[1] + h[1][2]) / (
             (h[2][0] * the_frame.ball[0] + h[2][1] * the_frame.ball[1] + h[2][2]))
         ball_point = (int(px), int(py))
-        field_img_copy = cv2.circle(field_img_copy, ball_point, CONSTS.CIRCLE_RADIUS, CONSTS.CIRCLE_COLOR2,
-                                    CONSTS.CIRCLE_THICKNESS)
+        field_img_copy = cv2.circle(field_img_copy, ball_point, consts.CIRCLE_RADIUS, consts.CIRCLE_COLOR2,
+                                    consts.CIRCLE_THICKNESS)
     # dst = cv2.warpPerspective(frame0, matrix, (field_img.shape[1], field_img.shape[0]))
     # dst2 = cv2.warpAffine(frame0, M, (field_img.shape[1], field_img.shape[0]))
 
