@@ -58,8 +58,8 @@ def create_vid_only_ball(ball, field_img):
     video = cv2.VideoWriter(new_vid_name, 0, 30, (field_img.shape[1], field_img.shape[0]))
     while count < CONSTS.MAX_FRAMES:
         field_img_copy = field_img.copy()
-        if count % 30 == 0:
-            print(count)
+        # if count % 30 == 0:
+        #     print(count)
         if ball.location_in_frames_perspective[count] is not None:
             field_img_copy = cv2.circle(field_img_copy, ball.location_in_frames_perspective[count],
                                         CONSTS.CIRCLE_RADIUS, CONSTS.CIRCLE_COLOR2, CONSTS.CIRCLE_THICKNESS)
@@ -82,8 +82,8 @@ def create_vid_one_player(player, field_img):
     video = cv2.VideoWriter(new_vid_name, 0, 30, (field_img.shape[1], field_img.shape[0]))
     while count < CONSTS.MAX_FRAMES:
         field_img_copy = field_img.copy()
-        if count % 30 == 0:
-            print(count)
+        # if count % 30 == 0:
+        #     print(count)
         if player.location_in_frames_perspective[count] is not None:
             field_img_copy = cv2.circle(field_img_copy, player.location_in_frames_perspective[count],
                                         CONSTS.CIRCLE_RADIUS, CONSTS.CIRCLE_COLOR2, CONSTS.CIRCLE_THICKNESS)
@@ -99,6 +99,7 @@ def create_vid_one_player(player, field_img):
 
 
 def create_vid_all_player(game, field_img):
+    print("Starting to write video")
     new_vid_name = "outputs/videos/game.avi"
     cap = cv2.VideoCapture(0)
     count = 0
@@ -106,8 +107,8 @@ def create_vid_all_player(game, field_img):
     video = cv2.VideoWriter(new_vid_name, 0, 30, (field_img.shape[1], field_img.shape[0]))
     while count < CONSTS.MAX_FRAMES:
         field_img_copy = field_img.copy()
-        if count % 30 == 0:
-            print(count)
+        # if count % 30 == 0:
+        #     print(count)
         for player_number in game.players:
             if game.players[player_number].location_in_frames_perspective[count] is not None:
                 if game.players[player_number].team == 0:
@@ -134,4 +135,4 @@ def create_vid_all_player(game, field_img):
         video.write(field_img_copy)
         count += frame_jump
         cap.set(1, count)
-
+    print("Finished to write video")
