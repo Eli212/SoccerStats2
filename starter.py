@@ -1,18 +1,11 @@
 # import track
 # from old import tracking
 import logic.outputs as outputs
-import playerteam
 import statistics
-import helpful
+from logic import helpful, playerteam
 
-import matplotlib.pyplot as plt
-
-import math
-import random
-import track
 import logic.Classes as Classes
 import logic.CONSTS as CONSTS
-import old.tracking as tracking
 import numpy as np
 
 import cv2
@@ -297,11 +290,11 @@ def fill_empty_frames(game):
 
 if __name__ == '__main__':
     max_frames = 178
-    vid_path = 'sources/TestVideos/vid2.mp4'
-    txt_file_name = "demofile3.txt"
+    vid_path = 'sources/TestVideos/vid3.mp4'
+    txt_file_name = "outputs/textfiles/demofile3.txt"
     field_img = cv2.imread('sources/TestImages/maracana_homemade.png')
 
-    # frames = track.start_tracking()
+    # frames = track.start_tracking(vid_path)
     # outputs.write_frames_to_file(frames, txt_file_name)
 
     frames = outputs.read_from_file_to_frame(txt_file_name)
@@ -310,10 +303,12 @@ if __name__ == '__main__':
     maracana_game = separate_players_and_ball(frames)
     # tracking.start_vid(vid_path, field_img, game, max_frames)
     change_perspective(maracana_game)
-    fix_ball_zig_zags(maracana_game, 10)
-    outputs.create_vid_only_ball(maracana_game.ball, field_img)
-    maracana_game.players = delete_out_of_field_players(maracana_game.players, field_img)
     fill_empty_frames(maracana_game)
+    fix_ball_zig_zags(maracana_game, 10)
+
+    # outputs.create_vid_only_ball(maracana_game.ball, field_img)
+
+    maracana_game.players = delete_out_of_field_players(maracana_game.players, field_img)
     statistics.stats_players_distance_covered(maracana_game.players)
     get_avg_distance_in_frame_of_all_players(maracana_game)
     fix_players_zig_zags(maracana_game, 10)

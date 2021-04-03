@@ -99,7 +99,7 @@ def create_vid_one_player(player, field_img):
 
 
 def create_vid_all_player(game, field_img):
-    new_vid_name = "game.avi"
+    new_vid_name = "outputs/videos/game.avi"
     cap = cv2.VideoCapture(0)
     count = 0
     frame_jump = 1

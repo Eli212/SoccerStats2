@@ -1,5 +1,5 @@
 import logic.CONSTS as CONSTS
-import helpful
+from logic import helpful
 
 
 def stats_players_distance_covered(players_arr):
@@ -12,7 +12,7 @@ def stats_players_distance_covered(players_arr):
                 #                        players_arr[player_number].location_in_frames_perspective[idx_frame + 1]))
                 players_arr[player_number].distance_covered += \
                     helpful.euclidean_distance(players_arr[player_number].location_in_frames_perspective[idx_frame],
-                                       players_arr[player_number].location_in_frames_perspective[idx_frame + 1])
+                                               players_arr[player_number].location_in_frames_perspective[idx_frame + 1])
 
     # print stats
     # for player_number in players_arr:

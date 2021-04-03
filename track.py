@@ -2,9 +2,9 @@ import sys
 import logic.Classes as CLASSES
 from old import tracking
 
-# from yolov5.utils.datasets import LoadImages, LoadStreams
-# from yolov5.utils.general import check_img_size, non_max_suppression, scale_coords
-# from yolov5.utils.torch_utils import select_device, time_synchronized
+from yolov5.utils.datasets import LoadImages, LoadStreams
+from yolov5.utils.general import check_img_size, non_max_suppression, scale_coords
+from yolov5.utils.torch_utils import select_device, time_synchronized
 from deep_sort_pytorch.utils.parser import get_config
 from deep_sort_pytorch.deep_sort import DeepSort
 import argparse
@@ -14,8 +14,8 @@ import shutil
 import time
 from pathlib import Path
 import cv2
-# import torch
-# import torch.backends.cudnn as cudnn
+import torch
+import torch.backends.cudnn as cudnn
 
 sys.path.insert(0, './yolov5')
 
@@ -186,7 +186,11 @@ def detect(opt, save_img=False):
                     for idx, current_bbox_xyxy in enumerate(bbox_xyxy):
                         mid_x = ((current_bbox_xyxy[2] - current_bbox_xyxy[0]) / 2) + current_bbox_xyxy[0]
                         mid_y = current_bbox_xyxy[3]
-                        new_player = CLASSES.Player(identities[idx], 0, 0, 0, 0, mid_x, mid_y)
+                        lt_x = current_bbox_xyxy[0]
+                        lt_y = current_bbox_xyxy[1]
+                        box_height = abs(current_bbox_xyxy[1] - current_bbox_xyxy[3])
+                        box_width = abs(current_bbox_xyxy[0] - current_bbox_xyxy[2])
+                        new_player = CLASSES.Player(identities[idx], lt_x, lt_y, box_height, box_width, mid_x, mid_y)
                         players_arr.append(new_player)
                 #     draw_boxes(im0, bbox_xyxy, identities)
 
@@ -258,16 +262,16 @@ def detect(opt, save_img=False):
     print('Done. (%.3fs)' % (time.time() - t0))
 
 
-def start_tracking():
+def start_tracking(vid_path):
     parser = argparse.ArgumentParser()
     parser.add_argument('--weights', type=str,
                         default='yolov5/weights/yolov5s.pt', help='model.pt path')
     # file/folder, 0 for webcam
     parser.add_argument('--source', type=str,
-                        default='sources/TestVideos/vid2.mp4', help='source')
+                        default=vid_path, help='source')
     parser.add_argument('--output', type=str, default='inference/output',
                         help='output folder')  # output folder
-    parser.add_argument('--img-size', type=int, default=640,
+    parser.add_argument('--img-size', type=int, default=854,
                         help='inference size (pixels)')
     parser.add_argument('--conf-thres', type=float,
                         default=0.4, help='object confidence threshold')
