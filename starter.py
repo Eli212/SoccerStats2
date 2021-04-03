@@ -306,8 +306,8 @@ if __name__ == '__main__':
     change_perspective(maracana_game)
 
     remove_irrelevant_players(maracana_game)
-    connect_players_to_one(maracana_game)
     fill_empty_frames(maracana_game)
+    connect_players_to_one(maracana_game)
     fix_ball_zig_zags(maracana_game, 2)
     maracana_game.players = delete_out_of_field_players(maracana_game.players, field_image)
     fix_players_zig_zags(maracana_game, 2)
