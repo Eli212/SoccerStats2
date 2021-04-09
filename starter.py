@@ -324,10 +324,28 @@ def connect_players_to_one(game):
 
 
 def connect_players(game, player_number, connections):
-    # TODO: connect the location_in_frames_perspective of the connections!
-    pass
-    # for connection in connections:
-    #     game.players[player_number]
+    for other_player_number in connections:
+        if game.players[other_player_number].is_active and game.players[player_number].is_active:
+            game.players[other_player_number].is_active = False
+            for i in range(consts.MAX_FRAMES):
+                if game.players[other_player_number].location_in_frames_perspective[i] is not None:
+                    game.players[player_number].location_in_frames_perspective[i] = \
+                        game.players[other_player_number].location_in_frames_perspective[i]
+
+
+def connect_ball_to_players(game):
+    for frame_idx in range(consts.MAX_FRAMES):
+        closest_distance = 99999
+        closest_player = None
+        if game.ball.location_in_frames_perspective[frame_idx] is not None:
+            for player_number in game.players:
+                if game.players[player_number].location_in_frames_perspective[frame_idx] is not None:
+                    if game.players[player_number].is_active:
+                        ball_player_distance = helpful.euclidean_distance(game.ball.location_in_frames_perspective[frame_idx], game.players[player_number].location_in_frames_perspective[frame_idx])
+                        if ball_player_distance < consts.MAX_DISTANCE_BALL_PLAYER_CONNECTION and ball_player_distance < closest_distance:
+                            closest_distance = ball_player_distance
+                            closest_player = player_number
+        game.ball.player_with_ball_in_frames_perspective[frame_idx] = closest_player
 
 
 if __name__ == '__main__':
@@ -350,15 +368,19 @@ if __name__ == '__main__':
     remove_irrelevant_players(maracana_game)
     fill_empty_frames(maracana_game)
     connect_players_to_one(maracana_game)
-    fix_ball_zig_zags(maracana_game, 2)
+    fill_empty_frames(maracana_game)
     maracana_game.players = delete_out_of_field_players(maracana_game.players, field_image)
-    fix_players_zig_zags(maracana_game, 2)
+    connect_ball_to_players(maracana_game)
+    # fix_ball_zig_zags(maracana_game, 2)
+    # fix_players_zig_zags(maracana_game, 2)
+
     # playerteam.identify_players_team(maracana_game, video_path)
 
     # Outputs ###
     # outputs.create_vid_only_ball(maracana_game.ball, field_img)
     # outputs.create_vid_one_player(maracana_game.players[21], field_img)
     outputs.create_vid_all_player(maracana_game, field_image)
+    # outputs.two_vids_to_one("outputs/videos/game.avi", "sources/TestVideos/vid3.mp4", "outputs/videos/final.mp4")
 
     # Statistics ###
     # statistics.stats_players_distance_covered(maracana_game.players)

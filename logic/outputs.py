@@ -1,5 +1,6 @@
 import logic.consts as consts
 import logic.classes as classes
+from moviepy.editor import VideoFileClip, concatenate_videoclips
 
 import cv2
 
@@ -138,3 +139,12 @@ def create_vid_all_player(game, field_img):
         count += frame_jump
         cap.set(1, count)
     print("Finished to write video")
+
+
+def two_vids_to_one(vid1_location, vid2_location, final_vid_location):
+    print("Starting to concatenate 2 videos to one")
+    clip_1 = VideoFileClip(vid1_location)
+    clip_2 = VideoFileClip(vid2_location)
+    final_clip = concatenate_videoclips([clip_1, clip_2], method="compose")
+    final_clip.write_videofile(final_vid_location)
+    print("Finished to concatenate 2 videos to one")

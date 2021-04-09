@@ -96,6 +96,7 @@ class BallSeparated:
     def __init__(self):
         self.location_in_frames = {}
         self.location_in_frames_perspective = {}
+        self.player_with_ball_in_frames_perspective = {}
 
 
 class Game:
