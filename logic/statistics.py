@@ -45,15 +45,6 @@ def get_avg_distance_in_frame_of_all_players(game):
 
 
 def increase_player_heat_map_radius(game, player_number, frame_idx):
-    # game.players[player_number].heat_map[game.players[player_number].location_in_frames_perspective[
-    #                                          frame_idx][1] - consts.HEAT_MAP_RADIUS:game.players[player_number]
-    #                                                                                     .location_in_frames_perspective[
-    #                                                                                     frame_idx][
-    #                                                                                     1] + consts.HEAT_MAP_RADIUS,
-    # game.players[player_number].location_in_frames_perspective[frame_idx][0] - consts.
-    #     HEAT_MAP_RADIUS:game.players[player_number].
-    #                         location_in_frames_perspective[frame_idx][0] + consts.HEAT_MAP_RADIUS] += 1
-
     x = np.arange(0, game.frame_width)
     y = np.arange(0, game.frame_height)
 
@@ -61,31 +52,31 @@ def increase_player_heat_map_radius(game, player_number, frame_idx):
     cy = game.players[player_number].location_in_frames_perspective[frame_idx][1]
     r = consts.HEAT_MAP_RADIUS
 
-    # The two lines below could be merged, but I stored the mask
-    # for code clarity.
-    mask = (x[np.newaxis, :] - cx) ** 2 + (y[:, np.newaxis] - cy) ** 2 < r ** 2
-    game.players[player_number].heat_map[mask] += 1
+    circle_mask = (x[np.newaxis, :] - cx) ** 2 + (y[:, np.newaxis] - cy) ** 2 < r ** 2
+    game.players[player_number].heat_map[circle_mask] += 1
 
 
 def calculate_heat_map(game):
-    print("Starting getting players heat map")
+    print("Starting setting players heat map")
     for player_number in game.players:
-        if game.players[player_number].is_active and player_number == 11:
+        if game.players[player_number].is_active:
             game.players[player_number].heat_map = np.zeros((game.frame_height, game.frame_width))
             for frame_idx in range(consts.MAX_FRAMES):
                 if game.players[player_number].location_in_frames_perspective[frame_idx] is not None:
                     increase_player_heat_map_radius(game, player_number, frame_idx)
-    print("Finished getting players heat map")
+    print("Finished setting players heat map")
     return game.players[11].heat_map
 
 
 def heat_map(game, field_image):
     player_heat_map = calculate_heat_map(game)
-    plt.imshow(player_heat_map, cmap='hot', interpolation='nearest', aspect='auto')
-    plt.axis('off')
-    plt.savefig('heatmap.png')
-    img = cv2.imread('heatmap.png')
-    blur = cv2.GaussianBlur(img, (5, 5), 0)
-    img_rgb = cv2.cvtColor(blur, cv2.COLOR_BGR2RGB)
-    plt.imshow(img_rgb)
-    plt.show()
+
+    # Plt image ###
+    # plt.imshow(player_heat_map, cmap='hot', interpolation='nearest', aspect='auto')
+    # plt.axis('off')
+    # plt.savefig('heatmap.png')
+    # img = cv2.imread('heatmap.png')
+    # blur = cv2.GaussianBlur(img, (5, 5), 0)
+    # img_rgb = cv2.cvtColor(blur, cv2.COLOR_BGR2RGB)
+    # plt.imshow(img_rgb)
+    # plt.show()

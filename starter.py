@@ -356,7 +356,6 @@ def set_video_frame_size(game, file_path):
     vid = cv2.VideoCapture(file_path)
     game.frame_height = int(vid.get(cv2.CAP_PROP_FRAME_HEIGHT))
     game.frame_width = int(vid.get(cv2.CAP_PROP_FRAME_WIDTH))
-    print(game.frame_height, game.frame_width)
 
 
 if __name__ == '__main__':
