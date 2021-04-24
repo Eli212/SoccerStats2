@@ -273,7 +273,7 @@ def start_tracking(vid_path):
     # file/folder, 0 for webcam
     parser.add_argument('--source', type=str,
                         default=vid_path, help='source')
-    parser.add_argument('--output', type=str, default='inference/output',
+    parser.add_argument('--output', type=str, default='outputs/trackingOutput',
                         help='output folder')  # output folder
     parser.add_argument('--img-size', type=int, default=854,
                         help='inference size (pixels)')

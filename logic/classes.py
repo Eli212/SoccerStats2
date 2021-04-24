@@ -105,3 +105,6 @@ class Game:
         self.players = players
         self.ball = ball
 
+        self.frame_width = 0
+        self.frame_height = 0
+

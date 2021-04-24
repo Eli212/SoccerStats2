@@ -1,7 +1,6 @@
 import logic.consts as consts
 import logic.classes as classes
 from moviepy.editor import VideoFileClip, concatenate_videoclips
-
 import cv2
 
 
@@ -130,10 +129,12 @@ def create_vid_all_player(game, field_img):
         if game.ball.location_in_frames_perspective[count] is not None:
             field_img_copy = cv2.circle(field_img_copy, game.ball.location_in_frames_perspective[count],
                                         consts.CIRCLE_RADIUS, consts.CIRCLE_COLOR2, consts.CIRCLE_THICKNESS)
-            field_img_copy = cv2.putText(field_img_copy, str("B"),
-                                         game.ball.location_in_frames_perspective[count],
-                                         consts.TEXT_FONT, consts.TEXT_FONTSCALE, consts.TEXT_COLOR,
-                                         consts.TEXT_THICKNESS)
+            if game.ball.player_with_ball_in_frames_perspective[count] is not None:
+                field_img_copy = cv2.putText(field_img_copy,
+                                             str(game.ball.player_with_ball_in_frames_perspective[count]),
+                                             game.ball.location_in_frames_perspective[count],
+                                             consts.TEXT_FONT, consts.TEXT_FONTSCALE, consts.TEXT_COLOR,
+                                             consts.TEXT_THICKNESS)
 
         video.write(field_img_copy)
         count += frame_jump

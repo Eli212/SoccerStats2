@@ -1,7 +1,9 @@
 # import track
 # from old import tracking
+import matplotlib as plt
+import os
 import logic.outputs as outputs
-from logic import helpful, playerteam, statistics, track
+from logic import utils, playerteam, statistics, track, userInterface
 
 import logic.classes as classes
 import logic.consts as consts
@@ -129,15 +131,15 @@ def fix_players_zig_zags(game, loop_times=1):
             for idx_frame in range(consts.MAX_FRAMES - 1):
                 if game.players[player_number].location_in_frames_perspective[idx_frame] is not None \
                         and game.players[player_number].location_in_frames_perspective[idx_frame + 1] is not None:
-                    if helpful.euclidean_distance(game.players[player_number].location_in_frames_perspective[idx_frame],
-                                                  game.players[player_number].location_in_frames_perspective[
+                    if utils.euclidean_distance(game.players[player_number].location_in_frames_perspective[idx_frame],
+                                                game.players[player_number].location_in_frames_perspective[
                                                       idx_frame + 1]) \
                             > consts.MAX_PLAYER_ZIG_ZAGS:
                         # print(midpoint(game.players[player_number].location_in_frames_perspective[idx_frame],
                         #                game.players[player_number].location_in_frames_perspective[idx_frame + 1]))
                         game.players[player_number].location_in_frames_perspective[idx_frame + 1] = \
-                            helpful.midpoint(game.players[player_number].location_in_frames_perspective[idx_frame],
-                                             game.players[player_number].location_in_frames_perspective[idx_frame + 1])
+                            utils.midpoint(game.players[player_number].location_in_frames_perspective[idx_frame],
+                                           game.players[player_number].location_in_frames_perspective[idx_frame + 1])
 
 
 def fix_ball_zig_zags(game, loop_times=1):
@@ -145,14 +147,14 @@ def fix_ball_zig_zags(game, loop_times=1):
         for idx_frame in range(consts.MAX_FRAMES - 1):
             if game.ball.location_in_frames_perspective[idx_frame] is not None \
                     and game.ball.location_in_frames_perspective[idx_frame + 1] is not None:
-                if helpful.euclidean_distance(game.ball.location_in_frames_perspective[idx_frame],
-                                              game.ball.location_in_frames_perspective[idx_frame + 1]) \
+                if utils.euclidean_distance(game.ball.location_in_frames_perspective[idx_frame],
+                                            game.ball.location_in_frames_perspective[idx_frame + 1]) \
                         > consts.MAX_PLAYER_ZIG_ZAGS:
                     # print(midpoint(game.players[player_number].location_in_frames_perspective[idx_frame],
                     #                game.players[player_number].location_in_frames_perspective[idx_frame + 1]))
                     game.ball.location_in_frames_perspective[idx_frame + 1] = \
-                        helpful.midpoint(game.ball.location_in_frames_perspective[idx_frame],
-                                         game.ball.location_in_frames_perspective[idx_frame + 1])
+                        utils.midpoint(game.ball.location_in_frames_perspective[idx_frame],
+                                       game.ball.location_in_frames_perspective[idx_frame + 1])
 
 
 def fill_empty_frames(game):
@@ -166,7 +168,7 @@ def fill_empty_frames(game):
                 player_none += 1
             elif game.players[player_number].location_in_frames_perspective[count_frames] is not\
                     None and player_none != 0 and valid_fill_frames:
-                if helpful.euclidean_distance(
+                if utils.euclidean_distance(
                         game.players[player_number].location_in_frames_perspective[count_frames - player_none - 1],
                         game.players[player_number].location_in_frames_perspective[count_frames]) < \
                         consts.MAX_PLAYER_JUMPING:
@@ -212,7 +214,7 @@ def fill_empty_frames(game):
             ball_none += 1
         elif game.ball.location_in_frames_perspective[count_frames] is \
                 not None and ball_none != 0 and valid_fill_frames:
-            if helpful.euclidean_distance(
+            if utils.euclidean_distance(
                     game.ball.location_in_frames_perspective[count_frames - ball_none - 1],
                     game.ball.location_in_frames_perspective[count_frames]) < consts.MAX_BALL_JUMPING:
                 for empty_frame_index in range(0, ball_none + 1):
@@ -301,7 +303,8 @@ def connect_players_to_one(game):
                 if combined:
                     potential_connections.append(other_player_number)
         game.players[player_number].potential_identities = potential_connections
-        print("After phase 1 - For player {0}, the potentials are: {1}".format(player_number, potential_connections))
+        if len(potential_connections) > 0:
+            print("After phase 1 - For player {0}, the potentials are: {1}".format(player_number, potential_connections))
 
     for player_number in game.players:
         potential_connections = []
@@ -309,18 +312,19 @@ def connect_players_to_one(game):
             for in_frame_player in game.players[player_number].in_frame:
                 for in_frame_other_player in game.players[other_player_number].in_frame:
                     if in_frame_player[0] > in_frame_other_player[0]:
-                        if helpful.euclidean_distance(game.players[player_number].location_in_frames_perspective[in_frame_player[0]],
-                                                      game.players[other_player_number].location_in_frames_perspective[in_frame_other_player[1]])\
+                        if utils.euclidean_distance(game.players[player_number].location_in_frames_perspective[in_frame_player[0]],
+                                                    game.players[other_player_number].location_in_frames_perspective[in_frame_other_player[1]])\
                                                       < 50:
                             potential_connections.append(other_player_number)
                             connect_players(game, player_number, potential_connections)
                     else:
-                        if helpful.euclidean_distance(game.players[player_number].location_in_frames_perspective[in_frame_player[1]],
-                                                      game.players[other_player_number].location_in_frames_perspective[in_frame_other_player[0]]) \
+                        if utils.euclidean_distance(game.players[player_number].location_in_frames_perspective[in_frame_player[1]],
+                                                    game.players[other_player_number].location_in_frames_perspective[in_frame_other_player[0]]) \
                                                       < 50:
                             potential_connections.append(other_player_number)
                             connect_players(game, player_number, potential_connections)
-        print("After phase 2 - For player {0}, the potentials are: {1}".format(player_number, potential_connections))
+        if len(potential_connections) > 0:
+            print("After phase 2 - For player {0}, the potentials are: {1}".format(player_number, potential_connections))
 
 
 def connect_players(game, player_number, connections):
@@ -341,14 +345,27 @@ def connect_ball_to_players(game):
             for player_number in game.players:
                 if game.players[player_number].location_in_frames_perspective[frame_idx] is not None:
                     if game.players[player_number].is_active:
-                        ball_player_distance = helpful.euclidean_distance(game.ball.location_in_frames_perspective[frame_idx], game.players[player_number].location_in_frames_perspective[frame_idx])
+                        ball_player_distance = utils.euclidean_distance(game.ball.location_in_frames_perspective[frame_idx], game.players[player_number].location_in_frames_perspective[frame_idx])
                         if ball_player_distance < consts.MAX_DISTANCE_BALL_PLAYER_CONNECTION and ball_player_distance < closest_distance:
                             closest_distance = ball_player_distance
                             closest_player = player_number
         game.ball.player_with_ball_in_frames_perspective[frame_idx] = closest_player
 
 
+def set_video_frame_size(game, file_path):
+    vid = cv2.VideoCapture(file_path)
+    game.frame_height = int(vid.get(cv2.CAP_PROP_FRAME_HEIGHT))
+    game.frame_width = int(vid.get(cv2.CAP_PROP_FRAME_WIDTH))
+    print(game.frame_height, game.frame_width)
+
+
 if __name__ == '__main__':
+    # Clone YoloV5 & Deep sort pytorch. Update & Install requirements.txt ###
+    # os.system('git clone https://github.com/ultralytics/yolov5.git')
+    # os.system('https://github.com/ZQPei/deep_sort_pytorch')
+    os.system('pip freeze > requirements.txt')
+    # os.system('pip install -r requirements.txt')
+
     # Path ###
     video_path = 'sources/TestVideos/vid3.mp4'
     txt_file_name = "outputs/textfiles/demofile5.txt"
@@ -371,6 +388,7 @@ if __name__ == '__main__':
     fill_empty_frames(maracana_game)
     maracana_game.players = delete_out_of_field_players(maracana_game.players, field_image)
     connect_ball_to_players(maracana_game)
+    set_video_frame_size(maracana_game, video_path)
     # fix_ball_zig_zags(maracana_game, 2)
     # fix_players_zig_zags(maracana_game, 2)
 
@@ -379,9 +397,12 @@ if __name__ == '__main__':
     # Outputs ###
     # outputs.create_vid_only_ball(maracana_game.ball, field_img)
     # outputs.create_vid_one_player(maracana_game.players[21], field_img)
-    outputs.create_vid_all_player(maracana_game, field_image)
+    # outputs.create_vid_all_player(maracana_game, field_image)
     # outputs.two_vids_to_one("outputs/videos/game.avi", "sources/TestVideos/vid3.mp4", "outputs/videos/final.mp4")
 
     # Statistics ###
     # statistics.stats_players_distance_covered(maracana_game.players)
     # statistics.get_avg_distance_in_frame_of_all_players(maracana_game)
+    statistics.heat_map(maracana_game, field_image)
+    # User Interface ###
+    # userInterface.start_ui(maracana_game)
