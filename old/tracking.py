@@ -116,7 +116,7 @@ def run_each_frame(video_path):
                     y1 = int(((y1 - pad_y // 2) / unpad_h) * img.shape[0])
                     x1 = int(((x1 - pad_x // 2) / unpad_w) * img.shape[1])
 
-                    player = classes.Player(int(obj_id), x1, y1, box_h, box_w, int(x1 + box_w / 2), int(y1 + box_h / 2))
+                    player = classes.Player3D(int(obj_id), x1, y1, box_h, box_w, int(x1 + box_w / 2), int(y1 + box_h / 2))
                     players.append(player)
 
                     color = colors[int(obj_id) % len(colors)]

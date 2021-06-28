@@ -1,4 +1,5 @@
 import collections
+import logic.utils as utils
 
 
 class Line:
@@ -55,7 +56,7 @@ class Frame:
         self.ball = None
 
 
-class Player:
+class Player3D:
     """
     'tl_x' and 'tl_y' are the point in top left.
     'point' is the bottom center.
@@ -74,7 +75,7 @@ class Player:
                str(self.width) + " " + str(self.point_x) + " " + str(self.point_y)
 
 
-class PlayerSeparated:
+class Player2D:
     def __init__(self, number):
         self.number = number
         self.location_in_frames = {}
@@ -86,10 +87,15 @@ class PlayerSeparated:
         self.in_frame = []
         self.out_frame = []
         self.potential_identities = []
+        self.heat_lines = []
 
     def sort_location_in_frames(self):
         location_in_frames_sorted = collections.OrderedDict(sorted(self.location_in_frames.items()))
         self.location_in_frames = location_in_frames_sorted
+
+    def compute_heat_lines_color(self, max_value):
+        for heat_line in self.heat_lines:
+            heat_line.compute_color(max_value)
 
 
 class BallSeparated:
@@ -108,3 +114,21 @@ class Game:
         self.frame_width = 0
         self.frame_height = 0
 
+
+class HeatLine:
+    def __init__(self, start, end):
+        self.start = start
+        self.end = end
+        self.dis = utils.euclidean_distance(start, end)
+        self.color = None
+
+    def compute_color(self, max_value, min_value=0):
+        if self.dis <= int((min_value + max_value) / 2):
+            r = 255
+            g = int(255 * self.dis / int((min_value + max_value) / 2))
+            b = 0
+        else:
+            r = int(255 * (max_value - self.dis) / int((min_value + max_value) / 2))
+            g = 255
+            b = 0
+        self.color = (r, g, b)

@@ -15,8 +15,11 @@ TEAM_A = (255, 0, 0)
 TEAM_B = (80, 127, 255)
 CIRCLE_COLOR2 = (0, 255, 0)
 
-# Line thickness of 2 px
+# Circle thickness
 CIRCLE_THICKNESS = 10
+
+# Line thickness
+LINE_THICKNESS = 2
 
 # Text Consts
 # Font
@@ -140,5 +143,9 @@ MAX_PLAYER_JUMPING = 120
 MAX_BALL_JUMPING = 150
 MAX_DISTANCE_BALL_PLAYER_CONNECTION = 25
 
-# Player
+# Player3D
 HEAT_MAP_RADIUS = 20
+
+# Field sizes
+FIELD_CM_IN_REAL_LIFE = 3300
+FIELD_PIXELS = 265

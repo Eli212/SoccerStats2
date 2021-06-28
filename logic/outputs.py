@@ -2,6 +2,7 @@ import logic.consts as consts
 import logic.classes as classes
 from moviepy.editor import VideoFileClip, concatenate_videoclips
 import cv2
+import matplotlib.pyplot as plt
 
 
 def write_frames_to_file(frames_arr, file_name):
@@ -38,9 +39,9 @@ def read_from_file_to_frame(file_name):
         for idx_players in range(num_of_players):
             player_info = f.readline()
             player_info = player_info.split(" ")
-            players.append(classes.Player(int(player_info[0]), float(player_info[1]), float(player_info[2]),
-                                          float(player_info[3]), float(player_info[4]), float(player_info[5]),
-                                          float(player_info[6])))
+            players.append(classes.Player3D(int(player_info[0]), float(player_info[1]), float(player_info[2]),
+                                            float(player_info[3]), float(player_info[4]), float(player_info[5]),
+                                            float(player_info[6])))
         current_frame = classes.Frame(idx_frame, players)
         current_frame.ball = frame_ball
         frames_arr.append(current_frame)
@@ -149,3 +150,14 @@ def two_vids_to_one(vid1_location, vid2_location, final_vid_location):
     final_clip = concatenate_videoclips([clip_1, clip_2], method="compose")
     final_clip.write_videofile(final_vid_location)
     print("Finished to concatenate 2 videos to one")
+
+
+def create_player_heat_line(player, field_image):
+    for heat_line in player.heat_lines:
+        field_image = cv2.line(field_image, heat_line.start, heat_line.end, heat_line.color, consts.LINE_THICKNESS)
+    field_image = cv2.putText(field_image, f'Player ID: {player.number}', (50, 50), consts.TEXT_FONT,
+                              consts.TEXT_FONTSCALE, consts.TEXT_COLOR, consts.TEXT_THICKNESS, cv2.LINE_AA)
+    plt.axis('off')
+    plt.imshow(field_image)
+    plt.savefig(f'outputs/heatlines/{player.number}.png', transparent=True, bbox_inches='tight')
+    # plt.show()

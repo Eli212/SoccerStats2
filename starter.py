@@ -18,7 +18,7 @@ def separate_players_and_ball(frames_arr):
     for idx_frame, frame in enumerate(frames_arr):
         for player in frame.players:
             if player.number not in players_arr:
-                players_arr[player.number] = classes.PlayerSeparated(player.number)
+                players_arr[player.number] = classes.Player2D(player.number)
             players_arr[player.number].location_in_frames[idx_frame] = (player.point_x, player.point_y)
             players_arr[player.number].player_box[idx_frame] = [player.tl_x, player.tl_y, player.height, player.width]
         ball.location_in_frames[idx_frame] = frame.ball
@@ -35,10 +35,8 @@ def separate_players_and_ball(frames_arr):
     return classes.Game("Maracana", players_arr, ball)
 
 
-def change_perspective(game):
+def change_perspective(game, field_points):
     points = ["B", "Y", "Y2", "C", "P", "Q", "V2", "W2", "VW2"]
-
-    field_points = consts.MARACANA_FIELD_POINTS2
 
     pts1 = np.float32([field_points[points[0]],
                        field_points[points[1]],
@@ -367,7 +365,7 @@ if __name__ == '__main__':
 
     # Path ###
     video_path = 'sources/TestVideos/vid3.mp4'
-    txt_file_name = "outputs/textfiles/demofile5.txt"
+    txt_file_name = "outputs/textfiles/demofile3.txt"
     field_image = cv2.imread('sources/TestImages/maracana_homemade.png')
 
     # Track video and write to file ###
@@ -379,7 +377,7 @@ if __name__ == '__main__':
 
     # Game cleaning and filtering ###
     maracana_game = separate_players_and_ball(frames)
-    change_perspective(maracana_game)
+    change_perspective(maracana_game, consts.MARACANA_FIELD_POINTS2)
 
     remove_irrelevant_players(maracana_game)
     fill_empty_frames(maracana_game)
@@ -388,8 +386,8 @@ if __name__ == '__main__':
     maracana_game.players = delete_out_of_field_players(maracana_game.players, field_image)
     connect_ball_to_players(maracana_game)
     set_video_frame_size(maracana_game, video_path)
-    # fix_ball_zig_zags(maracana_game, 2)
-    # fix_players_zig_zags(maracana_game, 2)
+    # fix_ball_zig_zags(maracana_game, 1)
+    # fix_players_zig_zags(maracana_game, 1)
 
     # playerteam.identify_players_team(maracana_game, video_path)
 
@@ -402,6 +400,8 @@ if __name__ == '__main__':
     # Statistics ###
     # statistics.stats_players_distance_covered(maracana_game.players)
     # statistics.get_avg_distance_in_frame_of_all_players(maracana_game)
-    statistics.heat_map(maracana_game, field_image)
+    # statistics.heat_map(maracana_game, field_image)
+    statistics.heat_line(maracana_game, field_image)
+
     # User Interface ###
     # userInterface.start_ui(maracana_game)
